@@ -22,8 +22,12 @@ from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.cross_validation import cross_val_score
 from sklearn.linear_model import LogisticRegressionCV
 from sklearn.linear_model import LogisticRegression
-from sklearn.linear_model import ElasticNetCV
-from sklearn.linear_model import LinearRegression
+from sklearn.metrics import confusion_matrix
+import itertools
+from sklearn import tree
+import pydotplus
+from sklearn.metrics import precision_recall_fscore_support
+import seaborn as sns
 
 # Helper Functions =================================================
 def simpleaxis(ax):
@@ -34,7 +38,100 @@ def simpleaxis(ax):
    ax.xaxis.set_tick_params(size=6)
    ax.yaxis.set_tick_params(size=6)
 
+def plot_confusion_matrix(cm, classes,
+                          normalize=False,
+                          title='Confusion matrix',
+                          cmap=plt.cm.Blues):
+    """
+    This function prints and plots the confusion matrix.
+    Normalization can be applied by setting `normalize=True`.
+    """
+    plt.figure(); plt.clf()
+    plt.imshow(cm, interpolation='nearest', cmap=cmap)
+    plt.title(title, size = 25)
+    plt.colorbar()
+    tick_marks = np.arange(len(classes))
+    plt.xticks(tick_marks, classes, rotation=45, size = 20)
+    plt.yticks(tick_marks, classes, size = 20)
 
+    if normalize:
+        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+        print("Normalized confusion matrix")
+    else:
+        print('Confusion matrix, without normalization')
+
+    print(cm)
+
+    thresh = cm.max() / 2.
+    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+        plt.text(j, i, cm[i, j],
+                 horizontalalignment="center",
+                 color="white" if cm[i, j] > thresh else "black", size = 20)
+
+    plt.tight_layout()
+    plt.ylabel('True label', size= 20)
+    plt.xlabel('Predicted label', size= 20)
+
+def plotROC(y_probs, classes):
+    fig = plt.figure(668);plt.clf()
+    ax = fig.add_subplot(111)
+    ax = simpleaxis(ax)
+    plt.plot([0, 1], [0, 1], '--', color=(0.6, 0.6, 0.6), label='Luck')
+    
+    if len(classes) <= 2:
+        fpr, tpr, thresholds = roc_curve(y_test, y_probs[:,1], pos_label = classes[1])
+        roc_auc = auc(fpr, tpr)    
+        plt.plot(fpr, tpr, lw=2, label='Positive: %s (area = %0.4f)' % (classes[1], roc_auc))
+    else:    
+        for i, class_ in enumerate(classes):
+            y_class_probs = [x[i] for x in y_probs]
+            fpr, tpr, thresholds = roc_curve(y_test, y_class_probs, pos_label = classes[i])
+            roc_auc = auc(fpr, tpr)    
+            plt.plot(fpr, tpr, lw=2, label='%s (area = %0.4f)' % (classes[i], roc_auc))
+        
+    plt.xlim([-0.05, 1.05]); plt.ylim([-0.05, 1.05])
+    plt.xlabel('False Positive Rate', size = 20); plt.xticks(size = 20)
+    plt.ylabel('True Positive Rate', size = 20); plt.yticks(size = 20)
+    plt.title('ROC Curve', size = 25)
+    plt.legend(loc = "lower right", fontsize = 20); 
+
+
+def plot_Learning_Curve(X_train, X_test, y_train, y_test, clf, res = 20):
+    train_len = X_train.shape[0]
+    samp_size = range(train_len//res, train_len, train_len//res)
+    
+    mean_scores, std_scores = [], []
+    scores_train, scores_test = [], []
+    
+    for sample in samp_size:
+        score = cross_val_score(clf, X_train.iloc[:int(sample)], y_train.iloc[:int(sample)], cv = 5)
+        mean_scores.append(np.mean(score) * 100)
+        std_scores.append(np.std(score) * 100)
+        clf.fit(X_train.iloc[:int(sample)], y_train.iloc[:int(sample)])
+        scores_train.append(np.mean(clf.predict(X_train.iloc[:int(sample)]).ravel() == y_train.iloc[:int(sample)].ravel()) * 100)
+        scores_test.append(np.mean(clf.predict(X_test.iloc[:int(sample)]).ravel() == y_test.iloc[:int(sample)].ravel()) * 100)
+    
+    fig = plt.figure(); plt.clf()
+    ax = fig.add_subplot(111)
+    ax = simpleaxis(ax)
+    plt.fill_between(samp_size, np.asarray(mean_scores) - np.asarray(std_scores),
+                         np.asarray(mean_scores) + np.asarray(std_scores), alpha=0.1,
+                         color="r", label = 'Validation')
+    plt.plot(samp_size, mean_scores, color = 'r', linewidth = 2, label = 'Validation')                     
+    plt.plot(samp_size, scores_train, 'b', linewidth = 2, label = 'Train')
+    plt.plot(samp_size, scores_test, 'g', linewidth = 2, label = 'Test')
+    plt.title('Learning Curve', size = 25)
+    plt.xticks(size = 20); plt.xlabel('Sample Size', size = 20)
+    plt.yticks(size = 20); plt.ylabel('Accuracy (%)', size = 20)
+    plt.legend(loc = 4, fontsize = 20)
+
+def plot_correlation_matrix(features, title = 'Correlation Matrix', cmap = plt.cm.RdBu):
+    plt.figure(); plt.clf()
+    plt.imshow(np.corrcoef(features.T), interpolation='nearest', cmap=cmap)
+    plt.title(title, size = 25)
+    plt.colorbar()
+# =====================================================================    
+    
 colnames = ['id_number' ,'Clump_Thickness','Uniformity_of_Cell_Size', 
             'Uniformity_of_Cell_Shape', 'Marginal_Adhesion', 'Single_Epithelial_Cell_Size', 
             'Bare_Nuclei', 'Bland_Chromatin' ,'Normal_Nucleoli',
@@ -44,37 +141,120 @@ url = "https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-w
 s = requests.get(url).content
 all_data = pd.read_csv(io.StringIO(s.decode('utf-8')), header = None)
 
-target = all_data[10]
-features = all_data.drop([0, 10], 1)
+all_data.shape
+
+all_data.dtypes
+all_data[6].unique()
+
+all_data[all_data[6] == '?'].shape[0]/float(all_data.shape[0])*100
+all_data_noNAs = all_data.drop(all_data.index[all_data[6] == '?'], 0)
+all_data_noNAs[6] = all_data_noNAs[6].astype(int)
+ 
+numBelign = sum(all_data_noNAs[10] == 2)/float(all_data_noNAs.shape[0])*100
+numMalig = sum(all_data_noNAs[10] == 4)/float(all_data_noNAs.shape[0])*100
+
+target = all_data_noNAs[10]
+features = all_data_noNAs.drop([0, 10], 1)
 
 target.unique()
-trueTarget = pd.Series({'Result':['benign' if result==2 else 'malignent' for result in target]})
+trueTarget = pd.Series(['benign' if result==2 else 'malignent' for result in target], index = features.index)
 
-numBelign = sum(target == 2)
-numMalig = sum(target == 4)
+# Plot correlation between features ==========================================
+plot_correlation_matrix(features)
 
-X_train
+plotData = pd.concat([features, trueTarget], axis = 1, ignore_index = True)
+plotData.columns = colnames[1:-1]+['Result']
+df_long = pd.melt(plotData, 'Result', var_name="Features", value_name="Count")
+sns.set(font_scale = 5)
+plt.figure()
+g = sns.factorplot("Features", hue = 'Result', y="Count", data=df_long, kind="box")
+g.set_xticklabels(rotation=30)
+
+
+
+# ==================
+X_train, X_test, y_train, y_test = train_test_split(features, trueTarget, test_size = 0.2, random_state = 42)
 
 crossVal = 10
-C = np.logspace(-5,5,31)
+C = np.logspace(0,5,51)
 LRCV = [LogisticRegressionCV(cv = crossVal, Cs = C, penalty = 'l1', solver = 'liblinear'),
         LogisticRegressionCV(cv = crossVal, Cs = C, penalty = 'l2', solver = 'liblinear')]
    
+classif_rates = []
 for LR in LRCV: 
     LR.fit(X_train, y_train)
-    y_pred = clf.predict(X_test)
+    y_pred = LR.predict(X_test)
     classif_rate = np.mean(y_pred.ravel() == y_test.ravel()) * 100
     classif_rates.append(classif_rate)
 
-classifiers = [
-               
-    KNeighborsClassifier(3),
-    SVC(kernel="linear", C=0.025),
-    SVC(gamma=2, C=1),
-    DecisionTreeClassifier(max_depth = 5),
-    RandomForestClassifier(max_depth = 5, n_estimators = 10, max_features=1),
-    #BernoulliRBM(learning_rate=1),
-    AdaBoostClassifier(),
-    GaussianNB(),
-    QuadraticDiscriminantAnalysis()]
+# use l2 since all coeffs are preserved
+    
+# Logistic Regression Diagnosis ==============================================
+# confusion matrix
+L2 = LogisticRegression(penalty = 'l2', C = LR.C_[0])
+L2.fit(X_train, y_train)
+y_pred = L2.predict(X_test)
 
+prf = precision_recall_fscore_support(y_test, y_pred)
+print('Precision: %s' % prf[0][0])
+print('Recall: %s' % prf[1][0])
+print('f1-score: %s' % prf[2][0])
+
+
+cnf_matrix = confusion_matrix(y_test, y_pred)
+plot_confusion_matrix(cnf_matrix, L2.classes_)
+
+# ROC curve =====================================================================
+
+y_probs = L2.predict_proba(X_test)
+plotROC(y_probs[:,1], L2.classes_[1])
+
+# Learning Curve ==============================================================
+
+plot_Learning_Curve(X_train, X_test, y_train, y_test, clf = L2, res = 40)
+
+# Plot coeffs ================================================================
+
+sorted_coeffs = [y for (x,y) in sorted(zip(L2.coef_[0],colnames[1:-1]))]
+sorted_coeff_vals = sorted(L2.coef_[0])
+
+plt.figure();plt.clf()
+plt.barh(range(len(sorted_coeff_vals)),sorted_coeff_vals, color = '#34495e')
+plt.yticks(np.asarray(range(len(sorted_coeffs)))+0.5, sorted_coeffs)
+
+# Decision tree ==============================================================
+DTC2 = tree.DecisionTreeClassifier(max_depth = 3, max_features = 9)
+DTC2.fit(X_train, y_train)
+y_pred_dtc = DTC2.predict(X_test)
+classif_rate = np.mean(y_pred_dtc.ravel() == y_test.ravel())*100
+
+prf_dtc = precision_recall_fscore_support(y_test, y_pred_dtc)
+print('Precision: %s' % prf_dtc[0][0])
+print('Recall: %s' % prf_dtc[1][0])
+print('f1-score: %s' % prf_dtc[2][0])
+
+cnf_matrix_dtc = confusion_matrix(y_test, y_pred_dtc)
+plot_confusion_matrix(cnf_matrix_dtc, DTC2.classes_)
+
+y_probs_dtc = DTC2.predict_proba(X_test)
+plotROC(y_probs_dtc, L2.classes_)
+
+dot_data = tree.export_graphviz(DTC2, out_file=None, feature_names = colnames[1:-1],
+                                class_names = DTC2.classes_, filled = True,
+                                rounded = True, special_characters = True) 
+graph = pydotplus.graph_from_dot_data(dot_data)
+graph.write_png("breastCancer.png")
+
+
+
+# try other classifiers (SVM)====================================================
+classifiers = [
+    SVC(kernel="linear", C=0.025),
+    SVC(gamma=2, C=1)]
+
+scores = []
+for clf in classifiers:
+    score = cross_val_score(clf, X_train, y_train, cv = 5)
+    scores.append(score)
+    print("Model has accuracy: %0.5f (+/- %0.5f)" % (score.mean(), score.std() * 2))
+# Logistic Regression l2 still wins

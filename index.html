@@ -13,30 +13,57 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
       	
-    <title>Generating Custom Music Recommendation Systems</title>
+    <title>Insight Data Challenge - Classifying Biopsied Breast Cells</title>
     <link rel="icon" type="image/png" href="/img/profile.png">
-    <link rel="stylesheet" href="/css/main.css">
+    
     <link href="/css/shCore.css" rel="stylesheet" type="text/css" />
-		<link href="/css/shThemeDefault.css" rel="stylesheet" type="text/css" />
+    <link href="/css/shThemeDefault.css" rel="stylesheet" type="text/css" />
+		<link href="/css/bootstrap.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="/css/main.css">
 		<link rel="stylesheet" href="/css/font-awesome/css/font-awesome.min.css">
-    <link href="//fonts.googleapis.com/css?family=Montserrat:400,700" rel="stylesheet" type="text/css">
-    <link href="//fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic" rel="stylesheet" type="text/css">
+    <link href="https://afeld.github.io/emoji-css/emoji.css" rel="stylesheet">
 
 		<link rel="favicon-144-precomposed"  href="/img/profile.png">
 		<link rel="shortcut icon" href="/img/profile.png">
+    <link rel="stylesheet" media="screen" href="https://fontlibrary.org/face/junction" type="text/css"/> 
 
     <script src='https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML'></script>
 
     <script type="text/javascript" src="//use.typekit.net/sjt4iho.js"></script>
  		<script type="text/javascript">try{Typekit.load();}catch(e){}</script>
       
-    <script src="../node_modules/chart.js/dist/Chart.js"></script>
-		<script src="../js/jquery-1.11.0.js"></script>
+    <!--<script src="../node_modules/chart.js/dist/Chart.js"></script>-->
+		<script src="/js/jquery-1.11.0.js"></script>
 
 		
       	<style> 
         /***** BASE STYLES *****/ 
-        
+        h1{
+          font-size: 200%;
+        }
+
+        h2{
+          font-size: 180%;
+        }
+        h3{
+          font-size: 160%;
+        }
+
+        h4{
+          font-size: 140%;
+        }
+        h5{
+          font-size: 120%;
+        }
+
+        h6{
+          font-size: 110%;
+        }
+        p {
+           font-family: 'JunctionRegular';
+           font-weight: normal;
+           font-style: normal;
+        } 
         code {
       		  color: inherit;
       		  background-color: rgba(0, 0, 0, 0.04);
@@ -47,7 +74,7 @@
         blockquote {
           font-size: 21px;  
           margin: 90px 0 90px 0; 
-          font-family: proxima-nova,proxima-nova,'proxima nova','helvetica neue',helvetica,sans-serif
+          font-family: 'JunctionRegular';
         }
 
         cite {
@@ -58,8 +85,8 @@
 
         .firstcharacter { 
           float: left; 
-          font-size: 54px; 
-          line-height: 60px;  
+          font-size: 108px; 
+          line-height: 70px;  
           padding-right: 7px;  
         }  
 
@@ -91,7 +118,7 @@
 
 
         nav ul li a {
-          font-family: proxima-nova,proxima-nova,'proxima nova','helvetica neue',helvetica,sans-serif;
+          font-family: 'JunctionRegular';
           color: #E8E8E8;
           text-decoration: none;
           transition: color 0.3s;
@@ -142,9 +169,6 @@
             background: rgba(29, 55, 69, 0.9);
           }
 
-        
-
-        
 
         .center {
           max-width: 1170px;
@@ -172,96 +196,6 @@
           width: 50%;
         }  
 
-        .introLetterDiv, .outroLetterDiv {
-            background-color: #fff; 
-            padding: 70px;  
-            text-align: left; 
-            max-width: 600px; 
-            margin: 0 auto;
-        }
-
-        .introLetterDiv h3 {
-            font-size: 21px;
-            font-weight: 400;
-            margin-bottom: 35px;
-            margin-top: -20px;
-        }
-
-        .introLetterDiv .signature {
-            text-align: right;
-        } 
-
-        .introLetterDiv .signatureBox {
-            text-align: center;
-            display: inline-block;
-        } 
-
-        .introLetterDiv p, .outroLetterDiv p {
-          max-width: 600px;
-          margin-left: 0;
-        } 
-
-        .main_title {
-          text-align: center;
-        }  
-
-        .letterOrange {
-          width: 85px; 
-          height:7px; 
-          display: block; 
-          background-color: #E9A857; 
-          margin:40px 0;" 
-        } 
-
-        .firstOrangeBar {
-            background-color: #E9A857;
-            display: block; 
-            height: 254px; 
-            width: 27px;
-        }
-
-        .headerThree h2 {
-          margin-top: 30px;
-          display: inline-block;
-          width: 450px;
-          vertical-align: top;
-        }
-
-        #three .thickOrangeLine {
-          position: absolute;
-          top: 160px;
-        }
-
-        .bulkUpImage {
-          margin-left: 22%; 
-        }
-
-        .nasties {
-           width: 60%;
-           position: absolute;
-           top: 50px;
-        }
-
-        .badHabbit {
-          width: 300px;
-          line-height: 94px;
-          display: inline-block;
-          margin-top: 0.83em;
-        }  
-
-        .thickOrangeLine { 
-          width: 82px; 
-          height: 27px; 
-          background-color: #E9A857; 
-          position: absolute;
-          top: 50px;
-        }
-
-        .learnMobile {
-            display: none;
-        }
-
-        
 
         /** Exeptions **/
         article#one {
@@ -394,16 +328,18 @@ p, .container .sideText5 p {
   	</head>
   	<body id="bootstrap-overrides">
       <style type="text/css"> 
+      
       #bootstrap-overrides hr.star-light {  
-        border-color: white;
-      	margin-left: auto;
+        border-color: #18BC9C;
+        margin-left: auto;
           margin-right: auto;
         }
        #bootstrap-overrides  hr.star-light:after {
       background-color: white;
       color: #2C3E50;}
+
       #bootstrap-overrides div.post-overlay-header{
-        background-color: white;
+        background-color: #2C3E50;
         display:inline-block;
       margin-left:30px;
       margin-right:auto;
@@ -418,6 +354,10 @@ p, .container .sideText5 p {
           display: block;
           width: 90px;
       }
+      img{
+        border: 3px solid #2C3E50;
+        padding: 5px;
+      }
       </style>
   	</body>
 	<body class="layout" id="bodyId">
@@ -429,10 +369,10 @@ p, .container .sideText5 p {
                <nav>
                   <ul class="firstUL">	
                     <br>
-                    <li class="navSection"><span class="navHeadline"><a style="color: #4C91B8;" href="/">Home</a></span>
+                    <li class="navSection"><span class="navHeadline"><a style="color: #4C91B8;" href="http://www.mattmoocar.me">Home</a></span>
                       <ul class="secondUL"> 
-                          <li><a href="/#portfolio">Portfolio</a></li>
-                          <li><a href="/blog/">Blog</a></li>
+                          <li><a href="http://www.mattmoocar.me">Matt Moocarme</a></li>
+                          <li><a href="http://www.mattmoocar.me/blog">Blog</a></li>
                       </ul>
                     </li>
                     <li class="navSection"><span class="navHeadline">Contents</span>
@@ -440,12 +380,12 @@ p, .container .sideText5 p {
                           <li><a href="/examples/SmoothPageScroll/#one">Goal</a></li>
                           <li><a href="/examples/SmoothPageScroll/#two">Approach</a></li>
                           <li><a href="/examples/SmoothPageScroll/#three">Exploratory Data Analysis</a></li>
-                          <li><a href="/examples/SmoothPageScroll/#four">Methods To Recommend Songs</a></li>
-                          <li><a href="/examples/SmoothPageScroll/#five">Results</a></li>
-                          <li><a href="/examples/SmoothPageScroll/#six">Recommending Songs Based on Metadata</a></li>
+                          <li><a href="/examples/SmoothPageScroll/#four">Logistic Regression</a></li>
+                          <li><a href="/examples/SmoothPageScroll/#five">Decision Trees</a></li>
+                          <li><a href="/examples/SmoothPageScroll/#six">SVMs</a></li>
                           <!--<li><a href="/examples/SmoothPageScroll/#seven">Emailing Results and Scheduling the Model</a></li>-->
                           <li><a href="/examples/SmoothPageScroll/#eight">Conclusion</a></li>
-                          <li><a href="/examples/SmoothPageScroll/#forecast">Related Projects</a></li>
+                          <!--<li><a href="/examples/SmoothPageScroll/#forecast">Related Projects</a></li>-->
                       </ul>
                     </li>
 
@@ -455,9 +395,9 @@ p, .container .sideText5 p {
           	</div>
 	<div class="wrapper" id="header">
 <p><br></p>
-<h1 align="center" style = "margin: 0;">Generating Custom Music Recommendation Systems</h1>
+<h1 align="center" style = "margin: 0;"><big>Classifying Biopsied Breast Cells</big></h1>
 <header>
-    <hr class="star-light" style='background-color:black;'>
+    <hr class="star-light" style='background-color:white;'>
 </header>
 </div>
           	<div class="wrapper">
@@ -467,7 +407,7 @@ p, .container .sideText5 p {
               			<div>
               				<h2>Goal</h2>
                       <p>The task is to develop a model that predicts whether a biopsied breast cell is benign (not harmful) or malignant (cancerous), given a set of attributes about the cell. </p>
-                      <p>The complete code can be found on github <a target='_blank' href="https://github.com/moocarme/Music-Recommendation-System">here</a>.</p>
+                      <p>The complete jupyter notebook can be found on github <a target='_blank' href="https://github.com/moocarme/insight-DC">here</a>.</p>
               			</div>
               			<div class="left"></div>
       				</div>  
@@ -479,7 +419,12 @@ p, .container .sideText5 p {
           			
          	 			<div class="center">    
             				<h2>Approach</h2>  
-								    <p>Classification model</p>
+								    <p>I am going to develop a classification model using the features provided. I will first focus on models that are highly interpretable, that will provide value by giving general rules with which to classify tumors that a person who actually conducts the tests can understand.</p>
+                    <p>If the distribution of classes is near equal I will use accuracy as the evaluation metric, wheras if they are highly skewed then I will use f1-score.</p>
+                    <p>I will begin with logistic regression and use cross-validation to choose the regularization parameter. I start with logistic regression because the results are easily interpretable. , which I believe would be of great value.</p>
+                    <p>Next, I would use other models such as decision trees which also have a high degree of interpretablitly, trees with small depth can be looked at as flowcharts with which to follow.</p>
+                    <p>Finally, I will explore more complicated models such as support vector machines (SVMs), to see if a more complicated model can outperform a simpler one. </p>
+                    <p><br></p>
             				<div class="left">
               					<div class="container">
                 					<div class="sideText2">
@@ -493,523 +438,233 @@ p, .container .sideText5 p {
          			  
       			</article>
       			<!-- End Resolution 2 -->
-    
+   
 	  			<!-- Resolution 3 -->
 	  			<article id="three" style="background-color:#f7f7f7;">
           			<div class="center">
           				<p><br></p>
         				<h2>Exploratory Data Analysis</h2>
               				<p><br></p>
-                      <p>Exploratory data analysis is performed in R to get a general feel for the data.</p>
-                      <div data-collapse>
-                        <h4> See here &#9660;</h4>
-                           <div>
-                             <pre class= "brush: python"># Load in libraries
-library(readr)
-library(dplyr)
-library(tidyr)
-library(RSQLite)
-library(ggplot2)
-
-# Load in data and create data frames
-# User data
-user_data <- as.data.frame(read.table('data/kaggle/kaggle_users.txt'))
-colnames(user_data) <- c('User_ID')
-user_data <- mutate(user_data, UID = row(user_data))
-
-# Songs data
-song_data <- as.data.frame(read.table('data/kaggle/kaggle_songs.txt'))
-colnames(song_data) <- c('Song_ID', 'index')
-
-# triplets in the form (User_ID, Song_ID, number of plays)
-triplets <- as.data.frame(read_table('data/kaggle/kaggle_visible_evaluation_triplets.txt'))
-colnames(triplets) <- c('User_ID', 'Song_ID', 'Plays')
-
-# dataframe to convert song ID to track ID since metadata is from different source 
-song2track <- as.data.frame(read.table('data/kaggle/taste_profile_song_to_tracks.txt', fill= TRUE))
-colnames(song2track) <- c('Song_ID', 'Track_ID')
-
-# Join dataframe
-totdf <- left_join(triplets, song2track, by = "Song_ID")
-
-# Load data from databases using SQLite
-con = dbConnect(drv=RSQLite::SQLite(), dbname="data/MillionSongSubset/AdditionalFiles/track_metadata.db")
-songs <- dbGetQuery(con, 'SELECT * FROM songs')
-
-con_meta = dbConnect(drv=RSQLite::SQLite(), dbname="song_metadata.sqlite")
-song_metadata <- dbGetQuery(con_meta, 'SELECT track_id, loudness, time_signature, song_hotttnesss FROM song_metadata')
-
-con_simArt = dbConnect(drv=RSQLite::SQLite(), dbname="data/MillionSongSubset/AdditionalFiles/artist_similarity.db")
-sim_Artists <- dbGetQuery(con_simArt, 'SELECT * FROM songs')
-
-# Join all data sources and remove unnecessary columns
-totdf2 <- totdf %>% left_join(songs, by = c('Track_ID' = 'track_id')) %>%
-  filter(!is.na(title)) %>% 
-  left_join(song_metadata, by = c('Track_ID' = 'track_id')) %>%
-  select(-song_id, -track_7digitalid, -shs_perf, -shs_work)
-
-# Exploratory data analysis
-popular_songs <- totdf2 %>% 
-  dplyr::group_by(title, artist_name) %>% 
-  dplyr::summarise(Total.plays = sum(Plays)) %>% 
-  dplyr::arrange(desc(Total.plays)) %>%
-  dplyr::top_n(100)
-
-popular_artists <- totdf2 %>% 
-  dplyr::group_by(artist_name) %>% 
-  dplyr::summarise(Total.plays = sum(Plays)) %>% 
-  dplyr::arrange(desc(Total.plays)) %>%
-  dplyr::top_n(100)
-
-hottest_artists<- totdf2 %>%
-  dplyr::select(artist_name, artist_hotttnesss) %>%
-  dplyr::distinct() %>%
-  dplyr::arrange(desc(artist_hotttnesss)) %>%
-  dplyr::top_n(100)
-
-hottest_songs <- totdf2 %>%
-  dplyr::select(artist_name, title, song_hotttnesss) %>%
-  dplyr::distinct() %>%
-  dplyr::arrange(desc(song_hotttnesss)) %>%
-  dplyr::top_n(100)
-
-songs_per_user <- totdf2 %>%
-  dplyr::select(User_ID, Song_ID) %>% 
-  dplyr::group_by(User_ID) %>%
-  dplyr::summarize(Total.Songs = n()) %>%
-  dplyr::arrange(Total.Songs) %>%
-  dplyr::group_by(Total.Songs) %>%
-  dplyr::summarise(Total.Count = n()) %>%
-  dplyr::mutate(Cum.Sum = cumsum(Total.Count))
-
-ggplot() + geom_line(data = songs_per_user, aes(x = Total.Songs, y = Cum.Sum/max(Cum.Sum)))
-
-users_per_song <- totdf2 %>%
-  dplyr::select(User_ID, Song_ID) %>%
-  dplyr::group_by(Song_ID) %>%
-  dplyr::summarise(Total.Users = n()) %>%
-  dplyr::group_by(Total.Users) %>%
-  dplyr::summarise(Total.Count = n()) %>%
-  dplyr::mutate(Cum.Sum = cumsum(Total.Count))
-
-ggplot() + 
-  geom_line(data = users_per_song, aes(x = Total.Users, y = Cum.Sum/max(Cum.Sum))) + 
-  scale_x_log10()
-
-ggplot() + geom_histogram(data = filter(totdf2, year>1900), aes(x = year), binwidth = 1, 
-                          fill = '#18BC9C', color = '#2C3E50') +  xlim(1940,2012) + 
-  labs(title = 'Number of Songs per Year', x = 'Year', y = 'Count')+
-  theme(plot.title = element_text(size=22), axis.text.x = element_text(size=18),
-        axis.text.y = element_text(size=18), text = element_text(size = 20))
-
-ggplot(data = filter(totdf2, year>1900), 
-       aes(x = as.factor(year), y = loudness) ) + geom_boxplot(aes(fill = (year))) +
-  scale_fill_gradient(low = 'yellow', high = 'red') + 
-  scale_x_discrete(breaks = seq(1920, 2010, 10)) + 
-  labs(title = 'Loudness vs Year', x = 'Year', y = 'Loudness (dB)')+
-  theme(plot.title = element_text(size=22), axis.text.x = element_text(size=18),
-        axis.text.y = element_text(size=18), text = element_text(size = 20))
-
+                      <p>Exploratory data analysis is performed in python to get a general feel for the data. First the libraries are installed. The data comes from <a href="https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-wisconsin/breast-cancer-wisconsin.data">The UCI machine learning repository</a>. The columns are given <a href="https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-wisconsin/breast-cancer-wisconsin.names">here</a> are as follows:</p>
+                      <br>
+                <table class="table table-hover" style = "width:100%; font-size:160%; font-align:center;">
+                    <tr ><th>Column</th><th>Format</th></tr>
+                    <tr><td>Sample code number</td><td>Unique ID number</td></tr>
+                    <tr><td>Clump Thickness</td><td>Integer (1-10)</td></tr>
+                    <tr><td>Uniformity of Cell Size</td><td>Integer (1-10)</td></tr>
+                    <tr><td>Uniformity of Cell Shape</td><td>Integer (1-10)</td></tr>
+                    <tr><td>Marginal Adhesion</td><td>Integer (1-10)</td></tr>
+                    <tr><td>Single Epithelial Cell Size</td><td>Integer (1-10)</td></tr>
+                    <tr><td>Bare Nuclei</td><td>Integer (1-10)</td></tr>
+                    <tr><td>Bland Chromatin</td><td>Integer (1-10)</td></tr>
+                    <tr><td>Normal Nucleoli</td><td>Integer (1-10)</td></tr>
+                    <tr><td>Mitoses</td><td>Integer (1-10)</td></tr>
+                    <tr><td>Class</td><td>Integer (2 = 'Benign', 4 = 'Malignant')</td></tr>
+                </table>
+                      <!--<div data-collapse>-->
+                       
+                             <pre class= "brush: python">import pandas as pd
+import requests
+import io
+import numpy as np
+from sklearn.metrics import roc_curve, auc
+import matplotlib.pyplot as plt
+from sklearn.cross_validation import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+from sklearn.cross_validation import cross_val_score
+from sklearn.linear_model import LogisticRegressionCV
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import confusion_matrix
+import itertools
                              </pre>
-                            </div>
+                        
+ 
+<p><br></p>
+<p>First we load in the data from the UCI repository URL</p>
+<p></p>
 
-                      </div>
-<h4>Most Popular Songs</h4>
-<p>Popular songs based on total numer of plays across all users.</p>
-<p><br></p>
- <table style="width:70%" align = "center">
-  <tr>
-    <th>Artist Name</th>
-    <th>Song Title</th>
-    <th>Total Plays</th>
-  </tr>
-  <tr>
-    <td>Dwight Yoakam</td>
-    <td>You're The One</td>
-    <td>35432 </td>
-  </tr>
-  <tr>
-    <td>Björk</td>
-    <td>Undo</td>
-    <td>33179</td>
-  </tr>
-  <tr>
-    <td>Kings Of Leon</td>
-    <td>Revelry</td>
-    <td>24359</td>
-  </tr>
-  <tr>
-    <td>Barry Tuckwell/Academy of St Martin-in-the-Fields/Sir Neville Marriner</td>
-    <td>Horn Concerto No. 4 in E flat K495: II. Romance (Andante cantabile)</td>
-    <td>17115</td>
-  </tr>
-  <tr>
-    <td>Florence + The Machine</td>
-    <td>Dog Days Are Over (Radio Edit)</td>
-    <td>14279</td>
-  </tr>
-  <tr>
-    <td>OneRepublic</td>
-    <td>Secrets</td>
-    <td>12392</td>
-  </tr>
-  <tr>
-    <td>Sam Cooke</td>
-    <td>Ain't Misbehavin</td>
-    <td>11610</td>
-  </tr>
-  <tr>
-    <td>Tub Ring</td>
-    <td>Invalid</td>
-    <td>10794 </td>
-  </tr>
-  <tr>
-    <td>Lonnie Gordon</td>
-    <td>Catch You Baby (Steve Pitron & Max Sanna Radio Edit)</td>
-    <td>10515</td>
-  </tr>
-  <tr>
-    <td>Five Iron Frenzy</td>
-    <td>Canada</td>
-    <td>9921</td>
-  </tr>
-</table> 
-<p><br></p>
-<h4>Hotttest Songs</h4>
-<p>Song hotttnesss[sic] is a metric defined by how much buzz the song is getting right now. This is derived from many sources, including mentions on the web, mentions in music blogs, music reviews, play counts, etc. </p>
-<p><br></p>
- <table style="width:70%" align="center">
-  <tr>
-    <th>Artist Name</th>
-    <th>Song Title</th>
-    <th>Hotttnesss Value</th>
-  </tr>
-  <tr>
-    <td>Florence + The Machine</td>
-    <td>Dog Days Are Over (Radio Edit)</td>
-    <td>1 </td>
-  </tr>
-  <tr>
-    <td>OneRepublic</td>
-    <td>Secrets</td>
-    <td>1</td>
-  </tr>
-  <tr>
-    <td>Pearl Jam</td>
-    <td>Black</td>
-    <td>1</td>
-  </tr>
-  <tr>
-    <td>Modest Mouse</td>
-    <td>Float On</td>
-    <td>1</td>
-  </tr>
-  <tr>
-    <td>Kings Of Leon</td>
-    <td>Use Somebody</td>
-    <td>1</td>
-  </tr>
-  <tr>
-    <td>Jimmy Eat World</td>
-    <td>The Middle</td>
-    <td>1</td>
-  </tr>
-  <tr>
-    <td>B.o.B</td>
-    <td>Nothin' On You [feat. Bruno Mars] (Album Version)</td>
-    <td>1</td>
-  </tr>
-  <tr>
-    <td>MIKA</td>
-    <td>Grace Kelly</td>
-    <td>1</td>
-  </tr>
-  <tr>
-    <td>Vampire Weekend</td>
-    <td>Cape Cod Kwassa Kwassa (Album)</td>
-    <td>1</td>
-  </tr>
-  <tr>
-    <td>Train</td>
-    <td>Marry Me</td>
-    <td>1</td>
-  </tr>
-</table> 
-</p>
-<p><br></p>
-<p> Interestingly, despite song hotttness being defned from the amount of buzz the song is currently getting, we see songs that are relatively old, such as Pearl Jam's 'Black', and Jimmy Eat World's 'The Middle', that are from 1991 and 2001 respectively.</p>
-<p><br></p>
-<p><b>Total songs in the dataset versus the year they were released.</b></p>
-<center><img class="img-responsive" src="figs/songs_per_year.png"  width="700" align="center"></center>
-<p><br></p>
-<p><b>Cumulative distribution function showing total number of songs have listened by less than x users.</b> For example, cumulative sum for 10 total users is around 137,000, this means that 137,000 songs have been listened to by at most 10 unique users.</p>
-<center><img class="img-responsive" src="figs/users_per_song.png"  width="700" align="center"></center>
-<p><br></p>
-<p><b>Cumulative distribution function of the total number of users have listened to less than x total songs.</b> For example, the cumulative sum for 20 total songs is around 90,000, which means that 90,000 users have listened to at most 20 unique songs.</p> 
-<center><img class="img-responsive" src="figs/songs_per_user.png"   width="700" align="center"></center>
-<p><br></p>
-<p><b>Loudness versus year.</b> Although we acknowledge that comparing features over time may not help in recommending songs, it may be valuable for visualizing trends in data and discovering any possible insights. One relationship we see confirms the <a target='_blank' href="http://www.npr.org/2009/12/31/122114058/the-loudness-wars-why-music-sounds-worse">"loudness wars"</a>, that refers to the trend of increasing the audio levels of music. The concept derives from the principle that if the audio levels are higher than other songs, when played on the radio the song will be louder, and listeners may pay attention to the song more. This is captured below in the boxplot graph. </p> 
-<center><img class="img-responsive" src="figs/loudness_per_year.png"   width="900" align="center"></center>
-<p><br></p>
+<pre class= "brush: python">
+url = "https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-wisconsin/breast-cancer-wisconsin.data"
+s = requests.get(url).content
+all_data = pd.read_csv(io.StringIO(s.decode('utf-8')), header = None)
 
-            			<div class="left"> 
-          				</div>   
-       				</div>    
-      			</article>
-     			<!-- End Resolution 3 -->
+all_data.shape
+
+all_data.dtypes
+all_data[6].unique()
+
+all_data[all_data[6] == '?'].shape[0]/float(all_data.shape[0])*100
+
+all_data_noNAs = all_data.drop(all_data.index[all_data[6] == '?'], 0)
+all_data_noNAs[6] = all_data_noNAs[6].astype(int)
+
+numBelign = sum(all_data_noNAs[10] == 2)/float(all_data_noNAs.shape[0])*100
+numMalig = sum(all_data_noNAs[10] == 4)/float(all_data_noNAs.shape[0])*100
+</pre>
+<p>If we look at the number of benign and malignant tumors in the total dataset it is a 65-35 split.</p>
+<p>We also see that there are a lot of '?', that correspond to missing values that are acknowledged in the <a href="https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-wisconsin/breast-cancer-wisconsin.names">documents provided</a>.</p>
+<p>For now we remove them sinnce they make up only 2.29% of the data.</p>
+<p>We can also look at the distribution of the various features using boxplots, and separate them by the target, whether they are benign or malignant.</p>
+<p><br></p>
+<center><img src="figs/eda1.png" width = "100%"></center>
+<p><br></p>
+<p>We see that the two classes vary distinctly in the various features, in which the majority of the benign tumors have values of 1, and malignant have distributions with larger means and higher  </p>
+<p>Next we split the data into the feature set, and the target (which are trying to predict).</p>
+<p>We can also look at the correlation between features.</p>
+<p><br></p>
+<pre class = 'brush: python'>
+target = all_data_noNAs[10]
+features = all_data_noNAs.drop([0, 10], 1)
+
+target.unique()
+trueTarget = pd.Series(['benign' if result==2 else 'malignent' for result in target])
+
+def plot_correlation_matrix(features, title = 'Correlation Matrix', cmap = plt.cm.RdBu):
+    plt.figure(); plt.clf()
+    plt.imshow(np.corrcoef(features.T), interpolation='nearest', cmap=cmap)
+    plt.title(title, size = 25)
+    plt.colorbar()
+
+plot_correlation_matrix(features)
+</pre>
+<p><br></p>
+<center><img class="img-responsive" src="figs/corr_matrix.png" width = '75%'></center>
+<p><br></p>
+</div>
+            </article>
+          <!-- End Resolution 3 -->
       
-    			<!-- Resolution 4 -->
-    			<article id="four">
-    				<div style="position: relative;">
-      					<div class="center">  
-          					
-							<h2>Methods to Recommend Songs</h2>
-							<p><br></p>
-							<h3>Cosine Similarity</h3>
-<p>When dealing with a large number of users and a large number of songs and find similarities between users or songs things can quickly get out of hand. For example, to calculate the song similarity between all songs we could go through each song and calculate its similarity with each other song, however that would involve nested for loops with <span class = "math">\(\frac{n(n-1)}{2} \)</span> operations. Since there are 149029 unique songs in the data set, this equates to 11104746906 operations. While this is highly parallelizable, for optimal use of resources, <b>we use linear algebra</b>.</p>
-<p> To solve the similarity between users and songs we construct a sparse matrix, <span class = "math">\(R(i,j)\)</span>, that is <span class = "math">\(m\times n\)</span>, where <i>m</i> is the total number of users, and <i>n</i> is the total number of songs. The entry of the matrix for user <i>i</i> at song <i>j</i> represents the relative number of plays that of the song compared to the total number of songs the user listens to, i.e., is the user listens to a song 6 times out of listening to 60 songs total, the relative play would be 0.1. We use relative plays as it will make constructing the similarity matrices easier.</p>
-<p>We define the cosine similarity for two arbitrary vectors as:</p>
-<div style="text-align: center;">
-<p><span class="math">Cosine similarity = \(\frac{u^Tv}{\lVert u \rVert \lVert v \rVert}\) </span></p>  
-</div>
-<p>The user-user similarity matrix can be computed as:</p>
-<div style="text-align: center;">
-<p><span class="math">User-user similarity = \( RR^T\) </span></p>  
-</div>
-<p>which produces a symmetric <span class = "math">\(m\times m\)</span> matrix, where <span class = "math">\(m\)</span> is the total number of users. The item-item similarity can be calculated in a similar way:</p>
-<div style="text-align: center;">
-<p><span class="math">Item-item similarity = \( R^TR\) </span></p>  
-</div>
-<p>which produces a symmetric <span class = "math">\(n\times n\)</span> matrix, where <span class = "math">\(n\)</span> is the total number of songs. </p>
-<p><br></p>
+          <!-- Resolution 4 -->
+          <article id="four">
+            <div class = 'center' style="position: relative;">
+                <p><br></p>
+<h2>Logistic Regression - <i>"What Features are Important?"</i></h2>            
+<p>I begin with 10 fold cross-validated logistic regression to obtain with l1 (ridge regression) and l2 (LASSO regression) regularization parameters.</p>
+<pre class = 'brush: python'>
+X_train, X_test, y_train, y_test = train_test_split(features, trueTarget, test_size = 0.2, random_state = 42)
 
-<h3>Evaluation Metric</h3>
-<p>We use the mean average precision (MAP) as the evaluation metric. </p>
-<p>For any k, define the <i>precision-at-k</i> <span class = "math">\(P_k\)</span> as the proportion of correct recommendations within the top-<i>k</i> of the predicted ranking:</p>
-<div style="text-align: center;">
-<p><span class="math">\( P_k(u,y)=\frac{1}{k}\sum_{j=1}^kM_{u,y(j)}\), </span></p>  
-</div>
-<p>next we take the average of the computed precisions:</p>
-<div style="text-align: center;">
-<p><span class="math">\( AP(u,y)=\frac{1}{n_u}\sum_{k=1}^\tau P_k(u,y)\times M_{u,y_u(k)}\) </span></p> 
-</div>
-<p>where <span class = "math">\(\tau\)</span> is the threshold that represents how many of the top predictions in <span class = "math">\(y_u\)</span> to include and <span class = "math">\(n_u\)</span> is the number of songs in the users hidden history.</p>
-<p>Finally, we take the average over all users precisions:</p>
-<div style="text-align: center;">
-<p><span class="math">\( MAP = \frac{1}{m}\sum_{u}AP(u,y_u)\) </span></p></div>
-<p>The R functions for the evaluation metrics are shown below:</p>
-
-<pre class = 'brush: python'>average_precision_at_k <- function(k, actual, predicted){
-  score <- 0.0
-  cnt <- 0.0
-  for (i in 1:min(k,length(predicted)))
-  {
-    if (predicted[i] %in% actual && !(predicted[i] %in% predicted[0:(i-1)]))
-    {
-      cnt <- cnt + 1
-      score <- score + cnt/i 
-    }
-  }
-  score <- score / min(length(actual), k)
-  return(score)
-}
-
-mAP = mean(average_precision_at_k(500, valid_data, predicted_songs))
+crossVal = 10
+C = np.logspace(0,5,51)
+LRCV = [LogisticRegressionCV(cv = crossVal, Cs = C, penalty = 'l1', solver = 'liblinear'),
+        LogisticRegressionCV(cv = crossVal, Cs = C, penalty = 'l2', solver = 'liblinear')]
+   
+classif_rates = []
+for LR in LRCV: 
+    LR.fit(X_train, y_train)
+    y_pred = LR.predict(X_test)
+    classif_rate = np.mean(y_pred.ravel() == y_test.ravel()) * 100
+    classif_rates.append(classif_rate)
 </pre>
 <p><br></p>
-<h3>Strategy - Recommend top 500</h3>
-<p>A simple strategy would be to suggest the same top 500 most played songs to all users.</p>
-<p>To do this, first, we load in the relevant libraries, and construct the training and validtion datasets. For details on the initial loading of the data from the text files and SQLite databases the R code above.</p>
-<pre class="brush: python">library(readr)
-library(dplyr)
-library(tidyr)
-library(Matrix)
-library(plyr)
-library(pbapply)
-
-# Load in data
-triplets <- as.data.frame(read_table('data/kaggle/kaggle_visible_evaluation_triplets.txt'))
-colnames(triplets) <- c('User_ID', 'Song_ID', 'Plays')
-
-# Split data into train and validation set
-set.seed(666) # reproducibility
-train_data <- triplets %>%
-  dplyr::group_by(User_ID) %>%
-  dplyr::sample_frac(0.8) %>%
-  dplyr::ungroup()
-
-valid_data <- setdiff(triplets, train_data)</pre>
+<p>I end up with a accuracy score for both as 95.62% which were performed on the test set.</p>
 <p><br></p>
-<p>The top 1000 songs are chosen based on total number number of plays across all users.</p>
-<pre class="brush: python"># baseline is to recommend top n most played songs,
-top1000songs <- train_data %>% 
-  dplyr::group_by(Song_ID) %>%
-  dplyr::summarise(Total.Plays = sum(Plays)) %>%
-  dplyr::arrange(desc(Total.Plays)) %>%
-  dplyr::top_n(1000) %>%
-  dplyr::ungroup()
+<h3>Performance diagnoses</h3>
+<div class = 'row'>
+  <div class = 'col-sm-7'>
+    <img class="img-responsive" src="figs/learning_curve.png" width = '95%'>
+  </div>
+  <div class = 'col-sm-5' style = 'padding-right:15%'>
+    <p>If we look at the learning curve of the model we can see that the model plateaus around a training size of 250, and there is little bias and little variance, which is good <i class="em em-smiley"></i><i class="em em-smiley"></i><i class="em em-smiley"></i> </p>
+  </div>
+</div>                 
 
-getBaseline_AveragePrecision(user){
-  actual.songs <- filter(valid_data, User_ID == unique_users$User_ID[user])
-  avg.Pres <- average_precision_at_k(k=500, actual = actual.songs$Song_ID, 
-                                     predicted = top1000songs$Song_ID[1:500])
-  return(avg.Pres)
-}
+<p>We can use the evaluation metrics <span class = 'math'>\(Precision = \frac{tp}{tp+fp}\)</span>, <span class = 'math'>\(Recall = \frac{tp}{tp+fn}\)</span>, <span class = 'math'>\(Precision = (Precision + Recall)/2)\)</span>, <span class = 'math'>\(tp\)</span> is the number of true positives, <span class = 'math'>\(fp\)</span> is the number of false positives, and <span class = 'math'>\(fn\)</span> is the number of false negatives.</p>
+<p><br></p>
+<center><table class="table table-hover" style = "width:70%; font-size:160%; font-align:center;">
+<tr ><th>Accuracy</th><td>0.9562</td></tr>
+<tr ><th>Precision</th><td>0.9398</td></tr>
+<tr><th>Recall</th><td>0.9873</td></tr>
+<tr><th>F1-score</th><td>0.9630</td></tr>
+</table></center>
+<p><br></p>
+<p>Next we can look at the ROC curves and the confusion matrix evaluated on the test set.</p>
+<div class = 'row'>
+  <pre class="brush: python">def plot_confusion_matrix(cm, classes,
+                          normalize=False,
+                          title='Confusion matrix',
+                          cmap=plt.cm.Blues):
+    """
+    This function prints and plots the confusion matrix.
+    Normalization can be applied by setting `normalize=True`.
+    """
+    plt.imshow(cm, interpolation='nearest', cmap=cmap)
+    plt.title(title)
+    plt.colorbar()
+    tick_marks = np.arange(len(classes))
+    plt.xticks(tick_marks, classes, rotation=45)
+    plt.yticks(tick_marks, classes)
 
-mAP_baseline <- pbsapply(seq(nrow(multMat2)), getUser_Average_Precision)
+    if normalize:
+        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+        print("Normalized confusion matrix")
+    else:
+        print('Confusion matrix, without normalization')
+
+    print(cm)
+
+    thresh = cm.max() / 2.
+    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+        plt.text(j, i, cm[i, j],
+                 horizontalalignment="center",
+                 color="white" if cm[i, j] > thresh else "black")
+
+    plt.tight_layout()
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')
+
+def plotROC(y_probs, classes):
+    fig = plt.figure(668);plt.clf()
+    ax = fig.add_subplot(111)
+    ax = simpleaxis(ax)
+    plt.plot([0, 1], [0, 1], '--', color=(0.6, 0.6, 0.6), label='Luck')
+    
+    for i, class_ in enumerate(classes):
+        y_class_probs = [x[i] for x in y_probs]
+        fpr, tpr, thresholds = roc_curve(y_test, y_class_probs, pos_label = classes[i])
+        roc_auc = auc(fpr, tpr)    
+        plt.plot(fpr, tpr, lw=2, label='%s (area = %0.4f)' % (classes[i], roc_auc))
+    
+    plt.xlim([-0.05, 1.05]); plt.ylim([-0.05, 1.05])
+    plt.xlabel('False Positive Rate', size = 20); plt.xticks(size = 20)
+    plt.ylabel('True Positive Rate', size = 20); plt.yticks(size = 20)
+    plt.title('ROC Curve', size = 25)
+    plt.legend(loc = "lower right", fontsize = 20); 
+
+L2 = LogisticRegression(penalty = 'l2', C = LR.C_[0])
+L2.fit(X_train, y_train)
+y_pred = L2.predict(X_test)
+cnf_matrix = confusion_matrix(y_test, y_pred)
+plot_confusion_matrix(cnf_matrix, L2.classes_)
+
+y_probs = L2.predict_proba(X_test)
+plotROC(y_probs, L2.classes_)
 </pre>
 <p><br></p>
-<h3>Strategy - Recommend songs by finding similar songs to songs in users list of listened songs</h3>
-<p>Two songs are similar if they have many users in common that listen to both.</p>
-<p>This is achieved in R by creating a sparse matrix, and performing the operations on the sparse matrix.</p>
-<pre class="brush: python"><code># Create data frames of the unique songs and users
-unique_users <- unique(train_data$User_ID)
-unique_songs <- unique(train_data$Song_ID)
-
-unique_users <- as.character(unique_users)
-unique_songs <- as.character(unique_songs)
-
-# Create new column where user/song ID -> unique numeric
-unique_users <- cbind(unique_users, as.numeric(seq(nrow(as.data.frame(unique_users)))))
-unique_songs <- cbind(unique_songs, as.numeric(seq(nrow(as.data.frame(unique_songs)))))
-
-colnames(unique_users) <- c('User_ID', 'UID')
-colnames(unique_songs) <- c('Song_ID', 'SID')
-
-train_data$User_ID <- as.character(train_data$User_ID)
-train_data$Song_ID <- as.character(train_data$Song_ID)
-
-# Join datasets
-train_data_2 <- train_data %>% 
-  dplyr::left_join(as.data.frame(unique_users), by = 'User_ID') %>%
-  dplyr::left_join(as.data.frame(unique_songs), by =  'Song_ID') %>%
-  dplyr::group_by(User_ID) %>%
-  dplyr::mutate(Relative.Plays = Plays/sum(Plays))
-
-# remove all NAs
-train_data_2[is.na(train_data_2)] <- 0 
-
-# Create sparse matrix
-sparse_rating_df <- sparseMatrix(i = as.numeric(train_data_2$UID), 
-                                 j = as.numeric(train_data_2$SID), 
-                                 x = train_data_2$Relative.Plays)</code></pre>
+  <div class = 'col-sm-6'>
+    <img class="img-responsive" src="figs/ROC.png" width = '95%'>
+  </div>
+  <div class = 'col-sm-6' >
+    <img class="img-responsive" src="figs/conf_mat.png" width = '100%'>
+  </div>
+</div>
 <p><br></p>
-<p>The method used to recommend the songs will be to recommend songs that are similar to songs already in the users list of listened songs. This is shown using the Venn diagram below.</p>
+<p>Plotting the feature coefficients for logistic regression tells us the relative importance of the features, in obtaining a true (malignant) observation prediction. Here We can see that bland chromatin, clump thickness, and mitoses are the most important features for predicting a malignant tumor. Whereas single epithelial cell size is not very important.</p>
 <p><br></p>
-<center><img src="figs/songSim.png" width="500" align="center"></center>
+<pre class="brush: python">
+sorted_coeffs = [y for (x,y) in sorted(zip(L2.coef_[0],colnames[1:-1]))]
+sorted_coeff_vals = sorted(L2.coef_[0])
+
+plt.figure();plt.clf()
+plt.barh(range(len(sorted_coeff_vals)),sorted_coeff_vals, color = '#34495e')
+plt.yticks(np.asarray(range(len(sorted_coeffs)))+0.5, sorted_coeffs)
+</pre>        	
 <p><br></p>
-<p>The R code to achieve the item-item similarity is as follows:</p>
-<pre class = 'brush: python'><code># Song similarity matrix
-multMat1 <- t(sparse_rating_df) %*% (sparse_rating_df)
-
-# Get top 500 similar songs of a given song
-gettop500simSong <- function(song){
-  user_sim <- multMat1[song,] 
-  user_sim <- as.data.frame(cbind(user_sim, seq(length(user_sim))))
-  colnames(user_sim) <- c('Similarity', 'SID')
-  user_sim <- user_sim %>%
-    dplyr::left_join(unique_songs, by = 'SID') %>%
-    dplyr::arrange(desc(Similarity)) %>%
-    dplyr::top_n(500, Similarity) 
-  return(user_sim)
-}
-
-# Get average precision of user via song similarity
-getSong_Average_Precision<- function(user){
-  # Get the visible song in users song list 
-  songs <- train_data_2 %>%
-    filter(UID == user) %>%
-    select(SID)
-  
-  # If SID is of factor class change to integer
-  if (class(songs$SID) == "factor"){
-    songs$SID <- as.integer(levels(songs$SID))[songs$SID]
-  }
-
-  # Go through songs and get 500 most similar songs
-  top500total <- ldply(songs$SID, gettop500simSong) %>%
-    anti_join(songs, by = 'SID') %>% # remove songs already in users song list
-    distinct() %>%                   # remove duplicates
-    arrange(desc(Similarity)) %>%    # order by similarity
-    top_n(500, Similarity)           # take top 500
-  
-  # Get actual songs from validation datset
-  actual.songs <- filter(valid_data, User_ID == unique_users$User_ID[user])
-
-  # Calculate average precision
-  avg.Pres <- average_precision_at_k(k=500, actual = actual.songs$Song_ID, predicted = top500total$Song_ID)
-  return(avg.Pres)
-}
-
-mAP <- mean(pbsapply(seq(nrow(multMat1)), getSong_Average_Precision))</code></pre>
-<p><br></p>
-<h3>Strategy - Recommend songs by finding similar users and selecting songs in their list of listened songs </h3>
-<p>Two users are similar if they have listened to many of the same songs. The user-user similarity is calculated in a similar way to the item-item similarity. After each users recommendations the songs are ordered in termes of total plays. The Venn diagram of the strategy is shown below.</p>
-<p><br></p>
-<center><img src="figs/userSim.png" width="500" align="middle"></center>
-<p><br></p>
-<p>The R code to achieve this is as follows:</p>
-<pre class = 'brush: python'><code># User similarity matrix
-multMat2 <- sparse_rating_df %*% t(sparse_rating_df)
-
-# Function that recommends songs based on 2 users song list
-recommend_by_user <- function(user1, user2){
-  # Get song intersection of 2 users
-  user1.songs <- train_data %>% 
-    dplyr::filter(User_ID == user1) %>%
-    dplyr::select(Song_ID, Plays)
-  user2.songs <- train_data %>% 
-    dplyr::filter(User_ID == user2) %>%
-    dplyr::select(Song_ID, Plays)
-
-  # Get songs in user2, that not in user1 
-  recommend.songs <- dplyr::anti_join(user2.songs, user1.songs, 
-                                      by = 'Song_ID') %>%
-    dplyr::arrange(desc(Plays)) %>%  # sort by number of plays
-    dplyr::select(-Plays)
-  return(recommend.songs)
-}
-
-getUser_Average_Precision<- function(user){
-  # Get top 100 unique users  
-  user1_sim <- multMat2[user,] 
-  user1_sim <- as.data.frame(cbind(user1_sim, seq(length(user1_sim))))
-  colnames(user1_sim) <- c('Similarity', 'UID')
-  user1_sim <- user1_sim %>%
-    dplyr::arrange(desc(Similarity)) %>%
-    dplyr::top_n(100, Similarity) %>%
-    dplyr::left_join(unique_users, by = 'UID')
-  
-  # Initialsize empty data frame
-  rec.songs <- data.frame()
-  i = 1
-  while(nrow(rec.songs) < 500){
-    # Recommend songs if they have any songs in common (similarity > 0)
-    if(user1_sim$Similarity[i] > 0.00000){
-      new.songs <- recommend_by_user(user1_sim$User_ID[user], user1_sim$User_ID[i])
-      rec.songs <- unique(rbind(rec.songs, new.songs))
-    } 
-    # otherwise choose from top 1000 songs
-    else{
-      new.songs <- as.data.frame(top1000songs$Song_ID[1:(1000-nrow(rec.songs))+1], 
-                                 stringsAsFactors = FALSE)
-      colnames(new.songs) <- 'Song_ID'
-      rec.songs <- unique(rbind(rec.songs, new.songs))
-    }
-    i = i + 1
-  }
-  
-  # Get actual songs from validation datset
-  actual.songs <- filter(valid_data, User_ID == unique_users$User_ID[user])
-
-  # Calculate averag precision
-  avg.Pres <- average_precision_at_k(k=500, actual = actual.songs$Song_ID, predicted = rec.songs$Song_ID)
-  return(avg.Pres)
-}
-
-mAP <- mean(pbsapply(seq(nrow(multMat2)), getUser_Average_Precision))</code></pre>
-<p><br></p>
-
+<center><img src="figs/featureCoeffs.png" width = '95%'></center>
           					<div class="left">     	
               					<div class="container">
                 					<div class="sideText3">
@@ -1020,7 +675,7 @@ mAP <- mean(pbsapply(seq(nrow(multMat2)), getUser_Average_Precision))</code></pr
 								
          	 				</div>
       					</div>
-    				</div>
+<p><br></p>
 				</article>
   				<!-- End Resolution 4 --> 
   
@@ -1028,74 +683,50 @@ mAP <- mean(pbsapply(seq(nrow(multMat2)), getUser_Average_Precision))</code></pr
     			<article id="five" style="background-color:#f7f7f7;">
       				<div class="center">      
       					<p><br></p>
-          				<h2>Results</h2>
+          				<h2>Decision Trees - <i>"Just Tell Me What to Do!"</i></h2>
                   <p><br></p>
-                  <p>In the results shown, <i>k</i>-fold cross validation is used, for <i>k</i>=5. The MAP for each of the strategies is shown below.</p>
-                  <script>
-                      var myChart_chordProg = new Chart({...})
-                  </script>
-                  <canvas id="myChart_chordProg" width="350" height="150"></canvas>
-                  <script>
-                  var ctx = document.getElementById("myChart_chordProg");
-                  ctx.width = 200;
-                  ctx.height = 100;
-                  var randomColorFactor = function() {
-                              return Math.round(Math.random() * 255);
-                          };
-                  var randomColor = function() {
-                              return 'rgba(' + randomColorFactor() + ',' + randomColorFactor() + ',' + randomColorFactor() + ',.7)';
-                          };
-                  var myChart = new Chart(ctx, {
-                      type: 'bar',
-                      data: {
-                          labels: ['Item/item', 'User/User', 'Baseline'],
-                          datasets: [{
-                              label: 'MAP',
-                              data: [0.0482, 0.0412,0.0213],
-                              backgroundColor: 'rgba(24, 188, 156, 0.6)',
-                              borderColor: 'rgba(9, 74, 61, 1)',
-                              borderWidth: 2
-                          }]
-                      },
-                      options: {
-                        title: {
-                              display: true,
-                              text: 'Mean Average Precision',
-                              fontSize: 30
-                          },
-                          scales: {
-                              yAxes: [{
-                                  ticks: {
-                                      beginAtZero:true
-                                  },
-                                  scaleLabel: {
-                                display: true,
-                                labelString: 'MAP at k=500',
-                                fontSize: 30
-                              }
-                              }],
-                              xAxes: [{
-                                  scaleLabel: {
-                                display: true,
-                                labelString: 'Strategy',
-                                fontSize: 30
-                              }
-                              }]
-                          }
-                      }
-                  });
-                  </script> 
-                  <p><br></p>
-                  <p>We can see that item/item similarity has the largest MAP score, slightly outperforming the user-user similarity strategy. In terms of run time, the base-line strategy is unsurprisingly the quickest, at around 0.72 seconds/user, followed by item-item similarity at around 4.23 seconds per user, and finally the user-user similarity was significantly slower at 121.2 seconds/user. This may be due to the user-user similarity matrix, while smaller than the item-item similarity (110000<sup>2</sup> vs 149029<sup>2</sup>), it is not as sparse, so sorting through the matrix, in looking for common users, as well as allocating memory is more expensive.</p>
-                  <p><br></p>
+                  <p>The next strategy I use is decision trees, since they are also highly interpretable. If the depth of the trees are not deep the results can be determined without a computer, which may be advantageous in some situations. </p>
+                  <p>We again create a model and create a confusion matrix and ROC plot. In determining the depth of the trees, more may not necessarily increase the accuracy, and a shallower depth is simpler, which can be advantageous.</p>
+                  <pre class="brush: python">
+DTC2 = tree.DecisionTreeClassifier(max_depth = 3, max_features = 9)
+DTC2.fit(X_train, y_train)
+y_pred_dtc = DTC2.predict(X_test)
+classif_rate = np.mean(y_pred_dtc.ravel() == y_test.ravel())*100
 
-          				
-          				<div class="left">
-							
-                  				
-          				</div>
-          				<div class="right">
-          				</div>
+cnf_matrix_dtc = confusion_matrix(y_test, y_pred_dtc)
+plot_confusion_matrix(cnf_matrix_dtc, DTC2.classes_)
+
+y_probs_dtc = DTC2.predict_proba(X_test)
+plotROC(y_probs_dtc, L2.classes_)
+</pre>
+<p><br></p>
+<div class ='row'>
+  <div class = 'col-sm-6'>
+    <img class="img-responsive" src="figs/ROC_decisionTree.png" width = '95%' >
+  </div>
+  <div class = 'col-sm-6' >
+    <img class="img-responsive" src="figs/conf_mat_dtc.png" width = '100%'>
+  </div>
+</div>
+<p><br></p>
+<center><table class="table table-hover" style = "width:70%; font-size:160%; font-align:center;">
+<tr ><th>Accuracy</th><td>0.9270</td></tr>
+<tr ><th>Precision</th><td>0.9167</td></tr>
+<tr><th>Recall</th><td>0.9620</td></tr>
+<tr><th>F1-score</th><td>0.9383</td></tr>
+</table></center>
+<p>Using decision trees I suffer a little on the accuracy, obtaining 92.70% on the test set, however I am able to get a highly interpretable flow chart that can be followed by any member of the medical community that can administer the test.</p>
+<pre class="brush: python">
+dot_data = tree.export_graphviz(DTC2, out_file=None, feature_names = colnames[1:-1],
+                                class_names = DTC2.classes_, filled = True,
+                                rounded = True, special_characters = True) 
+graph = pydotplus.graph_from_dot_data(dot_data)
+graph.write_png("breastCancer.png")
+                  </pre>
+
+                  <p><br></p>
+                  <center><img src="figs/breastCancer.png" width =  "95%"></center>
+          				<p><br></p>
       				</div>
     			</article>
   				<!-- End Resolution 5 --> 
@@ -1103,91 +734,71 @@ mAP <- mean(pbsapply(seq(nrow(multMat2)), getUser_Average_Precision))</code></pr
 				<!-- Resolution 6 --> 
     			<article id="six">
       				<div class="center">  
-						
-<h2>Recommending Songs based on Metadata</h2>
+						<p><br></p>
+<h2>SVMs - <i>"More Complicated, More Better?"</i></h2>
 <p><br></p>
-<h3>Discovering new artists</h3>
-<p>Since item/item similarity was gave the best results and was much quicker to process this is the stratey we will continue with, though the same recommendation methods can be used with the user/user similarity.</p>
-<p>Since there are no correct answers, evaluation metrics are redundant, and A/B/n testing would be more appropriate.</p>
-<p>To discover new artists we follow a similar method however in the top 500 similar artists we will order in the list in terms of artist ascending familiarity, and suggest those at the top first. The 'artist familiarity' corresponds to how well known in artist is. You can look at familiarity as the likelihood that any person selected at random will have heard of the artist. Kanye West has a familiarity close to 1, while a band like ‘Hot Rod Shopping Cart’ has a familiarity close to zero. In this way songs are both similar to songs in the users lists of listened songs, and unlikely to be heard by the user.</p>
-<p>This can be achieved using the R code below.</p>
-<pre class = 'brush: python'><code>discoverNewSongs<- function(user){
-  # Get users songs   
-  usersongs <- train_data_2 %>%
-    filter(UID == user) %>%
-    select(SID)
-  
-  # If SID is of factor class change to integer
-  if (class(usersongs$SID) == "factor"){
-    usersongs$SID <- as.integer(levels(usersongs$SID))[usersongs$SID]
-  }
+<p>We can use SVMs to see if a more complicated model can result in a more accurate prediction</p>
+<pre class = 'brush: python'>
+classifiers = [
+    SVC(kernel="linear", C=0.025),
+    SVC(gamma=2, C=1)]
 
-  # Get top 500 similar songs for each song in user song list
-  top500total <- ldply(usersongs$SID, gettop500simSong) %>% 
-    dplyr::anti_join(usersongs, by = 'SID') %>%                 # remove songs already in song list
-    dplyr::distinct() %>%                                       # remove duplicates
-    dplyr::top_n(500, Similarity) %>%                           # take top 500 based on similarity
-    dplyr::left_join(songs, by = c('Song_ID' = 'song_id')) %>%  # join with metadata dataset
-    dplyr::arrange(artist_familiarity) %>%                      # sort based on artist familiarity
-    dplyr::select(artist_name, title, artist_familiarity, Song_ID) 
-  return(top500total)
-}</code></pre>
+scores = []
+for clf in classifiers:
+    score = cross_val_score(clf, X_train, y_train, cv = 5)
+    scores.append(score)
+    print("Model has accuracy: %0.5f (+/- %0.5f)" % (score.mean(), score.std() * 2))
+</code></pre>
 <p><br></p>
-<h4>Playlists to chillout/workout to</h4>
-<p>Many songs from chillout playlists, such as those found on Spotify or last.fm have slow and easy-going, characterized by a low tempo that will relax the listener. Alternatively, if listeners want to get motivated to workout they may want listen to songs with high tempo that will get their heartrate up. This can be done with the following code:</p>
-<pre class = 'brush: python'><code># Find songs with low tempo
-downbeatSongs<- function(user){
-  # Get users songs
-  usersongs <- train_data_2 %>%
-    filter(UID == user) %>%
-    select(SID)
-  
-  # If SID is of factor class change to integer
-  if (class(usersongs$SID) == "factor"){
-    usersongs$SID <- as.integer(levels(usersongs$SID))[usersongs$SID]
-  }
-
-  # Get top 500 similar songs for each song in user song list
-  top500total <- ldply(usersongs$SID, gettop500simSong) %>%                
-    dplyr::distinct() %>%                                 # Remove duplicates
-    dplyr::top_n(500, Similarity) %>%                     # get 500 most popular songs
-    dplyr::left_join(song2track, by = 'Song_ID') %>%      # to convert song_id to trackid
-    dplyr::left_join(song_metadata, by = c('Track_ID' = 'track_id')) %>% # join with metadata
-    dplyr::arrange(tempo) %>%                             # order with respect to tempo
-    dplyr::select(Song_ID, tempo) %>%                     # select releveant columns
-    dplyr::filter(!is.na(Song_ID))                        # remove NAs
-  return(top500total)
-}
-
-# Find songs with high tempo
-upbeatSongs<- function(user){
-  usersongs <- train_data_2 %>%
-    filter(UID == user) %>%
-    select(SID)
-  
-  # If SID is of factor class change to integer
-  if (class(usersongs$SID) == "factor"){
-    usersongs$SID <- as.integer(levels(usersongs$SID))[usersongs$SID]
-  }
-
-  # Get top 500 similar songs for each song in user song list
-  top500total <- ldply(usersongs$SID, gettop500simSong) %>%
-    dplyr::distinct() %>%                                 # Remove duplicates
-    dplyr::top_n(500, Similarity) %>%                     # get 500 most popular songs
-    dplyr::left_join(song2track, by = 'Song_ID') %>%      # to convert song_id to trackid, 
-    dplyr::left_join(song_metadata, by = c('Track_ID' = 'track_id')) %>% # join with metadata
-    dplyr::arrange(desc(tempo)) %>%                       # order with respect to tempo
-    dplyr::select(Song_ID, tempo) %>%                     # select releveant columns
-    dplyr::filter(!is.na(Song_ID))                        # remove NAs
-  return(top500total)
-}</code></pre>
+<h3 style = "text-align:center;">Cross-Validation Accuracy</h3>
+<center><table class="table table-hover" style = "width:70%; font-size:160%; font-align:center;">
+<tr ><th>Linear Kernel</th><td>0.96335 &plusmn; 0.03487</td></tr>
+<tr ><th>Radial Basis Function Kernel</th><td>0.86257 &plusmn; 0.07192</td></tr>
+</table></center>
 <p><br></p>
-<p>In this application it doesn't matter if the songs are already in the users list of listened songs, unlike for recommending new music.</p>
-<p>This serves as a good template for A/B/n testing, creating indices based on a variety of metadata may also be used, for example a workout index may be defined as the <span class = 'math'>\(WI = \log(tempo\times danceability)\)</span>, where the danceabilty is defined from the <a target='_blank' href="https://developer.spotify.com/spotify-echo-nest-api/">Spotify/echonest API</a>. A/B testing can by varying the indices created, selecting songs based on the indices. The best index can be determined based on user feedback, such as number of plays, shares, or follows of the playlist. </p>
-<p><br></p>
+<p>The linear kernel outperformed the radial basis function and is on par with logistic regression. We can see how the data performed on the test set.</p>
+<pre class = 'brush: python'>
+clf_lin = classifiers[0]
+clf_rbf = classifiers[1]
+clf_lin.fit(X_train, y_train)
+clf_rbf.fit(X_train, y_train)
 
-<p><br></p>
+y_pred_lin = clf_lin.predict(X_test)
+y_pred_rbf = clf_rbf.predict(X_test)
 
+prf_lin = precision_recall_fscore_support(y_test, y_pred_lin)
+print('Precision: %s' % prf_lin[0][0])
+print('Recall: %s' % prf_lin[1][0])
+print('f1-score: %s' % prf_lin[2][0])
+
+prf_rbf = precision_recall_fscore_support(y_test, y_pred_rbf)
+print('Precision: %s' % prf_rbf[0][0])
+print('Recall: %s' % prf_rbf[1][0])
+print('f1-score: %s' % prf_rbf[2][0])
+</pre>
+<p><br></p>
+<h3 style = "text-align:center;">Test Metrics</h3>
+<center><table class="table table-hover" style = "width:70%; font-size:160%; font-align:center;">
+<tr ><th></th><th>Linear Kernel</th><th>Radial Basis Function Kernel</th></tr>
+<tr ><th>Accuracy</th><td>0.9708</td><td>0.8394</td></tr>
+<tr ><th>Precision</th><td>0.9630</td><td>1.0000</td></tr>
+<tr ><th>Recall</th><td>0.9873</td><td>0.7215</td></tr>
+<tr ><th>F1-Score</th><td>0.975</td><td>0.8383</td></tr>
+</table></center>
+<p><br></p>
+<div class ='row'>
+  <div class = 'col-sm-6'>
+    <h4>Linear Kernel</h4>
+    <img class="img-responsive" src="figs/conf_mat_lin.png" width = '95%' >
+  </div>
+  <div class = 'col-sm-6' >
+    <h4>Radial Basis Function Kernel</h4>
+    <img class="img-responsive" src="figs/conf_mat_rbf.png" width = '100%'>
+  </div>
+</div>
+<p><br></p>
+<p>We see that the linear kernel SVM performs much better than the radial basis function in terms of recall, however the radial basis function had perfect precision indicating that the radial basis function had a large number of false negatives. In cerain situations this may be desired, since every malignant tumor is classified correctly.</p>
+  <p>Though we are able to beat the scores of logistic regression by about 1% across all metrics, whether the slight increase in accuracy is beneficial over the interpretability is to be discussed with the implementers of the model.</p>
 						
           				<div class="left">
             				<p></p> 
@@ -1217,8 +828,7 @@ upbeatSongs<- function(user){
     			<article id="eight">
       				<div class="center">	
               			<h2>Conclusion</h2>
-                    <p>Overall, a successful recommendation system is made and has been applied to create custom mood-based playlists ready for A/B/n testing. It is shown that recommendation system based on item-item gives the largest mean average precision for the dataset. All strategies can be combined with different weights, however this in unrealistic with a single machine. Other methods to recommend songs is to find the user-user and item-item similarity via singular value decomposition, as this is fast and efficient, yet has a tendency to overfit, without regularization.</p>
-<p><br></p>
+                    <p>To conclude 3 models have been developed. Logistic regression is the overall best model incorporating evaluation metrics and interpretability of the feature importance. A decision tree model was also developed which has the benefit of ease of use in implementation, and could be suited for remote applications where the model can not be run by a computer. </p>
               			<div class="left"> 	
                 			<div class="container">
                 				<div class="sideText4">
@@ -1241,37 +851,6 @@ upbeatSongs<- function(user){
     			<article id="forecast" style=" display: block; margin-bottom: 0px; ">
       					<div class="center"> 
               				
-              				<p><br></p>
-                      <h2>Related Projects</h2>
-                      <p><br></p>
-                      <div id="twoimages" style = "display:inline-block;">
-                      <div class="post-overlay-header" style="background-image: url(/img/playlist.png);background-position: center; background-size: 600px ;">
-                                <div class="post-overlay-header-title">
-                                  <h1 class="post-title">
-                                    <a href="/blog/Ultimate-Playlist-Title/">
-                                      The Ulimate Playlist Title
-                                    </a>
-                                  </h1>       
-                                </div>
-                              </div>
-
-                              <div class="post-overlay-header" style="background-image: url(/img/two-listeners.jpg); background-position: center; background-size: 600px ;">
-                                <div class="post-overlay-header-title">
-                                  <h1 class="post-title">
-                                    <a href="/blog/Two-Listeners/">
-                                      Two Types of Music Streamer
-                                    </a>
-                                  </h1>
-                                </div>
-                              </div>
-
-                      </div>  
-              				<p><br></p>
-              				<p><br></p>
-              				<p><br></p>
-              				<p><br></p>
-              				<p><br></p>
-              				<p class style="font-style: italic; margin-bottom: 33px;">
       					</div>
       				
     			</article>
@@ -1279,7 +858,7 @@ upbeatSongs<- function(user){
               
         	</div> <!--extra wrapper-->
          	<footer class="text-center">
-        <div class="footer-below">
+        <!--<div class="footer-below">
             <div class="container">
                 <div class="row">
                     <div class="col-lg-12">
@@ -1288,7 +867,7 @@ upbeatSongs<- function(user){
                 </div>
             </div>
         </div>
-    </footer>
+    </footer>-->
     	</div><!-- end wrapper -->
  	<script type="text/javascript" src="//munchkin.marketo.net//munchkin-beta.js"></script><script>Munchkin.init('062-HAC-076', {customName: 'past-forward-2016', wsInfo: 'j1RR'});</script>
  	</body>
