@@ -40,6 +40,7 @@
         /***** BASE STYLES *****/ 
         h1{
           font-size: 200%;
+          font-family: 'JunctionRegular';
         }
 
         h2{
@@ -631,6 +632,17 @@ for LR in LRCV:
     plt.tight_layout()
     plt.ylabel('True label', size= 20)
     plt.xlabel('Predicted label', size= 20)
+
+def simpleaxis(ax):
+   """
+   This function removes spines for a cleaner plot - Thanks Hugo! 
+   """
+   ax.spines['top'].set_visible(False)
+   ax.spines['right'].set_visible(False)
+   ax.get_xaxis().tick_bottom()
+   ax.get_yaxis().tick_left()
+   ax.xaxis.set_tick_params(size=6)
+   ax.yaxis.set_tick_params(size=6)
 
 def plotROC(y_probs, classes):
     """

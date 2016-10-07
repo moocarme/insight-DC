@@ -26,12 +26,15 @@ import seaborn as sns
 
 # Helper Functions =================================================
 def simpleaxis(ax):
-   ax.spines['top'].set_visible(False)
-   ax.spines['right'].set_visible(False)
-   ax.get_xaxis().tick_bottom()
-   ax.get_yaxis().tick_left()
-   ax.xaxis.set_tick_params(size=6)
-   ax.yaxis.set_tick_params(size=6)
+    """
+    This function removes spines for a cleaner plot - Thanks Hugo! 
+    """
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.get_xaxis().tick_bottom()
+    ax.get_yaxis().tick_left()
+    ax.xaxis.set_tick_params(size=6)
+    ax.yaxis.set_tick_params(size=6)
 
 def plot_confusion_matrix(cm, classes,
                           normalize=False,
@@ -132,6 +135,23 @@ def plot_correlation_matrix(features, title = 'Correlation Matrix', cmap = plt.c
     plt.imshow(np.corrcoef(features.T), interpolation='nearest', cmap=cmap)
     plt.title(title, size = 25)
     plt.colorbar()
+    
+def plotBoxPlotFeatures(features, target, colnames = None):
+    """
+    This function makes a Boxplot from the various features, separated by
+    target column
+    """
+    assert (features.shape[0] == target.shape[0]), "Feature set and target set have different observations"
+    assert ((len(colnames) - 1) == features.shape[1]), "Colnames should have same length as number of columns of features and target combined"
+    if not colnames:
+        colnames = range(features.shape[1])
+    plotData = pd.concat([features, target], axis = 1, ignore_index = True)
+    plotData.columns = colnames[:-1]+['Result']
+    df_long = pd.melt(plotData, 'Result', var_name="Features", value_name="Count")
+    sns.set(font_scale = 1.5)
+    g = sns.factorplot("Features", hue = 'Result', y="Count", data=df_long, kind="box")
+    g.set_xticklabels(rotation=30)
+    
 # =====================================================================    
     
 colnames = ['id_number' ,'Clump_Thickness','Uniformity_of_Cell_Size', 
@@ -164,13 +184,7 @@ trueTarget = pd.Series(['benign' if result==2 else 'malignent' for result in tar
 # Plot correlation between features ==========================================
 plot_correlation_matrix(features)
 
-plotData = pd.concat([features, trueTarget], axis = 1, ignore_index = True)
-plotData.columns = colnames[1:-1]+['Result']
-df_long = pd.melt(plotData, 'Result', var_name="Features", value_name="Count")
-sns.set(font_scale = 5)
-plt.figure()
-g = sns.factorplot("Features", hue = 'Result', y="Count", data=df_long, kind="box")
-g.set_xticklabels(rotation=30)
+plotBoxPlotFeatures(features, trueTarget, colnames)
 
 # ==================
 X_train, X_test, y_train, y_test = train_test_split(features, trueTarget, test_size = 0.2, random_state = 42)
