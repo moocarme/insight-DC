@@ -508,7 +508,7 @@ all_data.shape
 
 all_data.dtypes
 all_data[6].unique()
-
+ 
 # how many values of ?
 all_data[all_data[6] == '?'].shape[0]/float(all_data.shape[0])*100
 
@@ -522,7 +522,7 @@ numMalig = sum(all_data_noNAs[10] == 4)/float(all_data_noNAs.shape[0])*100
 </pre>
 <p>If we look at the number of benign and malignant tumors in the total dataset it is a 65-35 split.</p>
 <p>We also see that there are a lot of '?', that correspond to missing values that are acknowledged in the <a href="https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-wisconsin/breast-cancer-wisconsin.names">documents provided</a>.</p>
-<p>For now we remove them since they make up only 2.29% of the data. If there were a greater number of missing values or their remaining features followed a non-random distribution, i.e., they are correlated we may have to deal with missing values in another way, such as imputation. This may be as simple as setting the missing values to the mean, mode or median from the remaining values of feature.</p>
+<p>For now we remove them since they make up only 2.29% of the data. If there were a greater number of missing values or their remaining features followed a non-random distribution, i.e., they are correlated we may have to deal with missing values in another way, such as imputation. This may be as simple as setting the missing values to the mean, mode or median from the remaining values of feature if the number of missing values is low. If there were more missing values, more complicated ways of imputing the data would be to use k-nearest neighbours, and choosing the value from the mean, or randomly from the distribution of the nearest neighbours.</p>
 <p>We can also look at the distribution of the various features using boxplots, and separate them by the target, whether they are benign or malignant.</p>
 <p><br></p>
 <center><img src="figs/eda1.png" width = "100%"></center>
@@ -944,8 +944,8 @@ plot_confusion_matrix(cnf_matrix_rbf, clf_rbf.classes_)
   </div>
 </div>
 <p><br></p>
-<p>We see that the linear kernel SVM performs much better than the radial basis function in terms of recall, however the radial basis function had perfect precision indicating that the radial basis function had a large number of false negatives. In cerain situations this may be desired, since every malignant tumor is classified correctly.</p>
-  <p>Though we are able to beat the scores of logistic regression by about 1% across all metrics, whether the slight increase in accuracy is beneficial over the interpretability is to be discussed with the implementers of the model.</p>
+<p>We see that the linear kernel SVM performs much better than the radial basis function in terms of recall, however the radial basis function had perfect precision indicating that the radial basis function had a large number of false negatives. In cerain situations this may be desired, since every malignant tumor is classified correctly. An example would be when tests are cheap, and you don't mind telling people they have cancer when they don't. For this reason recall is generally considered a more appropriate evaluation metric for this type of problem.</p>
+<p>Though we are able to beat the scores of logistic regression by about 1% across all metrics, whether the slight increase in accuracy is beneficial over the interpretability is to be discussed with the implementers of the model. It is important to note tha this increase of just over 1% represents a correct classification of 2 datapoints over logistic regression due to the small sample size. </p>
 						
           				<div class="left">
             				<p></p> 
