@@ -410,7 +410,7 @@ p, .container .sideText5 p {
               			<div>
               				<h2>Goal</h2>
                       <p>The task is to develop a model that predicts whether a biopsied breast cell is benign (not harmful) or malignant (cancerous), given a set of attributes about the cell. </p>
-                      <p>The complete jupyter notebook can be found on github <a target='_blank' href="https://github.com/moocarme/insight-DC">here</a>.</p>
+                      <p>The complete python script can be found on github <a target='_blank' href="https://github.com/moocarme/insight-DC/blob/master/breastCancerClassif.py">here</a>.</p>
               			</div>
               			<div class="left"></div>
       				</div>  
@@ -422,8 +422,7 @@ p, .container .sideText5 p {
           			
          	 			<div class="center">    
             				<h2>Approach</h2>  
-                    <p>{{ site.baseurl}}</p>
-								    <p>I am going to develop a classification model using the features provided. I will first focus on models that are highly interpretable, that will provide value by giving general rules with which to classify tumors that a person who actually conducts the tests can understand.</p>
+                    <p>I am going to develop a classification model using the features provided. I will first focus on models that are highly interpretable, that will provide value by giving general rules with which to classify tumors that a person who actually conducts the tests can understand.</p>
                     <p>In determining what is a If the distribution of classes is near equal I will use accuracy as the evaluation metric, wheras if they are highly skewed then I will use f1-score.</p>
                     <p>I will begin with logistic regression and use cross-validation to choose the regularization parameters. I start with logistic regression because the results are easily interpretable. Someone conducting the tests on the tumors can have an idea on which features may be of greater importance in classifying the ype of tumor.</p>
                     <p>Next, I would use other models such as decision trees which also have a high degree of interpretablitly, trees with small depth can be looked at as flowcharts with which to follow to determine the class of tumor is benign or malignant.</p>
