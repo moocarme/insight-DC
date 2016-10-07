@@ -231,6 +231,28 @@ def plot_PCA_boundary(clf, features, target):
     ax_res.contourf(xx, yy, Z_mal, cmap=plt.cm.Reds, alpha=0.25)
     ax_res.contourf(xx, yy, Z_ben, cmap=plt.cm.Blues, alpha=0.25)
 
+def plot_Manifold_Sep(features, target, n_neighbors = 6):
+    """
+    Plot over various manifolds to see if the data can be decomposed 
+    in 2 dimension other ays
+    """
+    methods = ['standard', 'ltsa', 'hessian', 'modified']
+    labels = ['LLE', 'LTSA', 'Hessian LLE', 'Modified LLE']
+     
+    for i, method in enumerate(methods):
+        t0 = time.time()
+        trans_data = manifold.LocallyLinearEmbedding(n_neighbors, 2,
+                              method=method, eigen_solver = 'dense')\
+                             .fit_transform(features.astype('float64')).T
+        t1 = time.time()
+        print("%s: %.2g sec" % (method, t1 - t0))
+        feat1 = pd.DataFrame(np.column_stack([trans_data.T, target]))
+        feat1.columns = ['FPC', 'SPC', 'Class']
+        sns.lmplot(x='FPC', y='SPC', \
+                   hue='Class', data = feat1, palette = 'hls', fit_reg=False)
+        #sns.jointplot(x='FPC', y="SPC", data=feat1, kind="kde")
+        plt.title(labels[i])
+        
 # =====================================================================    
     
 colnames = ['id_number' ,'Clump_Thickness','Uniformity_of_Cell_Size', 
@@ -396,21 +418,4 @@ plot_PCA_boundary(clf_rbf2, features, trueTarget)
 plot_PCA_boundary(clf_lin2, features, trueTarget)
 
 # Other manifolds =============================================
-methods = ['standard', 'ltsa', 'hessian', 'modified']
-labels = ['LLE', 'LTSA', 'Hessian LLE', 'Modified LLE']
-f, ax = plt.subplots(1,4)
-
-n_neighbors = 9
-for i, method in enumerate(methods):
-    t0 = time.time()
-    trans_data = manifold\
-        .LocallyLinearEmbedding(n_neighbors, 2,
-                                method=method, eigen_solver = 'dense').fit_transform(features.astype('float64')).T
-    t1 = time.time()
-    print("%s: %.2g sec" % (method, t1 - t0))
-    feat1 = pd.DataFrame(np.column_stack([trans_data.T, trueTarget]))
-    feat1.columns = ['FPC', 'SPC', 'Class']
-    sns.lmplot(x='FPC', y='SPC', \
-               hue='Class', data = feat1, palette = 'hls', fit_reg=False)
-    #sns.jointplot(x='FPC', y="SPC", data=feat1, kind="kde")
-    plt.title(labels[i])
+plot_Manifold_Sep(features, trueTarget)
