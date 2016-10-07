@@ -948,6 +948,40 @@ plot_confusion_matrix(cnf_matrix_rbf, clf_rbf.classes_)
 <h3>Visualizing SVMs</h3>
 <p>For greater understanding, we can use PCA we can map the features onto 2 principal components and plot the boundaries formed by the SVM.</p>
 <p><br></p>
+<pre class='brush: python'>def plot_PCA_boundary(clf, features, target):
+    """
+    Fit and plot PCA with boundary
+    """
+    t1 = PCA(n_components = 2).fit_transform(features)
+    clf.fit(t1, target)
+    
+    h = .02  # step size in the mesh
+    x_min, x_max = t1[:, 0].min() - 1, t1[:, 0].max() + 1
+    y_min, y_max = t1[:, 1].min() - 1, t1[:, 1].max() + 1
+    xx, yy = np.meshgrid(np.arange(x_min, x_max, h),
+                         np.arange(y_min, y_max, h))
+    
+    Z_proba = clf.predict_proba(np.c_[xx.ravel(), yy.ravel()])
+    
+    Z_mal = Z_proba[:,0].reshape(xx.shape)
+    Z_ben = Z_proba[:,1].reshape(xx.shape)
+    
+    t2 = np.column_stack([t1, trueTarget])
+    t3 =pd.DataFrame(data = t2)
+    t3.columns=['First Principle Component','Second Principle Component','Class']
+    result = sns.lmplot(x='First Principle Component', y='Second Principle Component', \
+               hue='Class', data = t3, palette = 'hls', fit_reg=False)
+    ax_res = result.ax
+    ax_res.contourf(xx, yy, Z_mal, cmap=plt.cm.Reds, alpha=0.25)
+    ax_res.contourf(xx, yy, Z_ben, cmap=plt.cm.Blues, alpha=0.25)
+
+clf_rbf2 = SVC(gamma=2, C=1, probability = True)
+clf_lin2 = SVC(kernel="linear", C = 0.025, probability = True)
+
+plot_PCA_boundary(clf_rbf2, features, trueTarget)
+plot_PCA_boundary(clf_lin2, features, trueTarget)
+</pre>
+<p><br></p>
 <div class= 'row'>
   <div class = 'col-sm-6'>
     <h4>Linear Kernel</h4>
