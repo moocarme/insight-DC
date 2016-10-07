@@ -24,6 +24,10 @@ from sklearn import tree
 import pydotplus
 from sklearn.metrics import precision_recall_fscore_support
 import seaborn as sns
+from sklearn.decomposition import PCA
+from sklearn.cross_decomposition import CCA
+from sklearn import manifold
+import time
 
 # Helper Functions =================================================
 def simpleaxis(ax):
@@ -178,6 +182,55 @@ def plot_Feature_Importances(clf, featureNames):
     plt.barh(range(len(sorted_coeff_vals)),sorted_coeff_vals, color = '#34495e')
     plt.yticks(np.asarray(range(len(sorted_coeffs)))+0.5, sorted_coeffs)
     
+def plot_PCA(features, target):
+    """
+    Plots the features according to 2 principle components using PCA
+    """
+    t1 = PCA(n_components = 2).fit_transform(features)
+    t2 = np.column_stack([t1, target])
+    t3 =pd.DataFrame(data = t2)
+    t3.columns=['First Principle Component','Second Principle Component','Class']
+    sns.lmplot(x='First Principle Component', y='Second Principle Component', \
+               hue='Class', data = t3, palette = 'hls', fit_reg=False)
+
+def plot_CCA(features, target):
+    """
+    Plots the features according to 2 principle components using CCA
+    """
+    t1 = CCA(n_components = 2).fit(features, target).transform(features)
+    t2 = np.column_stack([t1, target])
+    t3 =pd.DataFrame(data = t2)
+    t3.columns=['First Principle Component','Second Principle Component','Class']
+    sns.lmplot(x='First Principle Component', y='Second Principle Component', \
+               hue='Class', data = t3, palette = 'hls', fit_reg=False)
+    
+def plot_PCA_boundary(clf, features, target):
+    """
+    Fit and plot PCA with boundary
+    """
+    t1 = PCA(n_components = 2).fit_transform(features)
+    clf.fit(t1, target)
+    
+    h = .02  # step size in the mesh
+    x_min, x_max = t1[:, 0].min() - 1, t1[:, 0].max() + 1
+    y_min, y_max = t1[:, 1].min() - 1, t1[:, 1].max() + 1
+    xx, yy = np.meshgrid(np.arange(x_min, x_max, h),
+                         np.arange(y_min, y_max, h))
+    
+    Z_proba = clf.predict_proba(np.c_[xx.ravel(), yy.ravel()])
+    
+    Z_mal = Z_proba[:,0].reshape(xx.shape)
+    Z_ben = Z_proba[:,1].reshape(xx.shape)
+    
+    t2 = np.column_stack([t1, trueTarget])
+    t3 =pd.DataFrame(data = t2)
+    t3.columns=['First Principle Component','Second Principle Component','Class']
+    result = sns.lmplot(x='First Principle Component', y='Second Principle Component', \
+               hue='Class', data = t3, palette = 'hls', fit_reg=False)
+    ax_res = result.ax
+    ax_res.contourf(xx, yy, Z_mal, cmap=plt.cm.Reds, alpha=0.25)
+    ax_res.contourf(xx, yy, Z_ben, cmap=plt.cm.Blues, alpha=0.25)
+
 # =====================================================================    
     
 colnames = ['id_number' ,'Clump_Thickness','Uniformity_of_Cell_Size', 
@@ -205,7 +258,7 @@ all_data[all_data[6] == '?'].shape[0]/float(all_data.shape[0])*100
 all_data_noNAs = all_data.drop(all_data.index[all_data[6] == '?'], 0)
 all_data_noNAs[6] = all_data_noNAs[6].astype(int)
 
-# count num benign and malignant
+# count number benign and malignant
 numBelign = sum(all_data_noNAs[10] == 2)/float(all_data_noNAs.shape[0])*100
 numMalig = sum(all_data_noNAs[10] == 4)/float(all_data_noNAs.shape[0])*100
 
@@ -225,6 +278,10 @@ plot_correlation_matrix(features)
 # Plot correlation between features 
 plot_Features_Box_Plot(features, trueTarget, colnames[1:])
 
+# Plot PCA
+plot_PCA(features, trueTarget)
+
+# ===============================================================
 # Split into test and train datasets
 X_train, X_test, y_train, y_test = train_test_split(features, trueTarget, test_size = 0.2, random_state = 42)
 
@@ -284,7 +341,7 @@ plot_confusion_matrix(cnf_matrix_dtc, DTC2.classes_)
 
 # Plot ROC
 y_probs_dtc = DTC2.predict_proba(X_test)
-plotROC(y_probs_dtc, L2.classes_)
+plotROC(y_probs_dtc, DTC2.classes_)
 
 # Plot decision tree
 dot_data = tree.export_graphviz(DTC2, out_file=None, feature_names = colnames[1:-1],
@@ -297,8 +354,8 @@ graph.write_png("breastCancer.png")
 
 # set clsssifiers
 classifiers = [
-    SVC(kernel="linear", C = 0.025),
-    SVC(gamma=2, C=1)]
+    SVC(kernel="linear", C = 0.025, probability = True),
+    SVC(gamma=2, C=1, probability = True)]
 
 # perform cross-validation
 scores = []
@@ -330,3 +387,30 @@ plot_confusion_matrix(cnf_matrix_rbf, clf_rbf.classes_)
 
 #y_probs_lin = clf_lin.predict_proba(X_test)
 #plotROC(y_probs_lin, L2.classes_)
+
+# Plot boundaries==============================================
+clf_rbf2 = SVC(gamma=2, C=1, probability = True)
+clf_lin2 = SVC(kernel="linear", C = 0.025, probability = True)
+
+plot_PCA_boundary(clf_rbf2, features, trueTarget)
+plot_PCA_boundary(clf_lin2, features, trueTarget)
+
+# Other manifolds =============================================
+methods = ['standard', 'ltsa', 'hessian', 'modified']
+labels = ['LLE', 'LTSA', 'Hessian LLE', 'Modified LLE']
+f, ax = plt.subplots(1,4)
+
+n_neighbors = 9
+for i, method in enumerate(methods):
+    t0 = time.time()
+    trans_data = manifold\
+        .LocallyLinearEmbedding(n_neighbors, 2,
+                                method=method, eigen_solver = 'dense').fit_transform(features.astype('float64')).T
+    t1 = time.time()
+    print("%s: %.2g sec" % (method, t1 - t0))
+    feat1 = pd.DataFrame(np.column_stack([trans_data.T, trueTarget]))
+    feat1.columns = ['FPC', 'SPC', 'Class']
+    sns.lmplot(x='FPC', y='SPC', \
+               hue='Class', data = feat1, palette = 'hls', fit_reg=False)
+    #sns.jointplot(x='FPC', y="SPC", data=feat1, kind="kde")
+    plt.title(labels[i])
