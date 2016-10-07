@@ -396,7 +396,8 @@ p, .container .sideText5 p {
           	</div>
 	<div class="wrapper" id="header">
 <p><br></p>
-<h1 align="center" style = "margin: 0;"><big>Classifying Biopsied Breast Cells</big></h1>
+<h1 align="center" style = "margin: 0;"><big>Classifying Biopsied Breast Cells</big> or...</h1>
+<h1 align="center" style = "margin: 0;"><big>Bagging Breast Bumps</big></h1>
 <header>
     <hr class="star-light" style='background-color:white;'>
 </header>
@@ -492,20 +493,28 @@ import seaborn as sns
             'Uniformity_of_Cell_Shape', 'Marginal_Adhesion', 'Single_Epithelial_Cell_Size', 
             'Bare_Nuclei', 'Bland_Chromatin' ,'Normal_Nucleoli',
             'Mitoses','Class']#: (2 for benign, 4 for malignant)
-            
+
+# url containing the data            
 url = "https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-wisconsin/breast-cancer-wisconsin.data"
 s = requests.get(url).content
+
+#grab the dats in csv format
 all_data = pd.read_csv(io.StringIO(s.decode('utf-8')), header = None)
 
+# exploratory data analysis
 all_data.shape
 
 all_data.dtypes
 all_data[6].unique()
 
+# how many values of ?
 all_data[all_data[6] == '?'].shape[0]/float(all_data.shape[0])*100
+
+# Not that many (~2.3%)so lets drop them and reformat
 all_data_noNAs = all_data.drop(all_data.index[all_data[6] == '?'], 0)
 all_data_noNAs[6] = all_data_noNAs[6].astype(int)
- 
+
+# count number benign and malignant
 numBelign = sum(all_data_noNAs[10] == 2)/float(all_data_noNAs.shape[0])*100
 numMalig = sum(all_data_noNAs[10] == 4)/float(all_data_noNAs.shape[0])*100
 </pre>
@@ -520,11 +529,14 @@ numMalig = sum(all_data_noNAs[10] == 4)/float(all_data_noNAs.shape[0])*100
 <p>Next we split the data into the feature set, and the target (which are trying to predict).</p>
 <p>We can also look at the correlation between features.</p>
 <p><br></p>
-<pre class = 'brush: python'>
+<pre class = 'brush: python'># create target and features dataset
 target = all_data_noNAs[10]
 features = all_data_noNAs.drop([0, 10], 1)
 
+#check for consistency
 target.unique()
+
+# convert to interpretable results (and to check we dont treat as numerical values)
 trueTarget = pd.Series(['benign' if result==2 else 'malignent' for result in target], index = features.index)
 
 def plot_correlation_matrix(features, title = 'Correlation Matrix', cmap = plt.cm.RdBu_r):
@@ -539,13 +551,25 @@ def plot_correlation_matrix(features, title = 'Correlation Matrix', cmap = plt.c
 
 plot_correlation_matrix(features)
 
-plotData = pd.concat([features, trueTarget], axis = 1, ignore_index = True)
-plotData.columns = colnames[1:-1]+['Result']
-df_long = pd.melt(plotData, 'Result', var_name="Features", value_name="Count")
-sns.set(font_scale = 5)
-plt.figure()
-g = sns.factorplot("Features", hue = 'Result', y="Count", data=df_long, kind="box")
-g.set_xticklabels(rotation=30)
+def plot_Features_Box_Plot(features, target, colnames = None):
+    """
+    This function makes a Boxplot from the various features, separated by
+    target column
+    """
+    assert (features.shape[0] == target.shape[0]), "Feature set and target set have different observations"
+    if colnames:
+        assert ((len(colnames) - 1) == features.shape[1]), "Colnames should have same length as number of columns of features and target combined"
+    else:
+        colnames = range(features.shape[1] + 1)
+    plotData = pd.concat([features, target], axis = 1, ignore_index = True)
+    plotData.columns = colnames[:-1]+['Result']
+    df_long = pd.melt(plotData, 'Result', var_name="Features", value_name="Count")
+    sns.set(font_scale = 1.5)
+    g = sns.factorplot("Features", hue = 'Result', y="Count", data=df_long, kind="box")
+    g.set_xticklabels(rotation=30)
+
+# Plot correlation between features 
+plot_Features_Box_Plot(features, trueTarget, colnames[1:])
 </pre>
 <p><br></p>
 <center><img class="img-responsive" src="figs/corr_matrix.png" width = '75%'></center>
@@ -560,25 +584,69 @@ g.set_xticklabels(rotation=30)
                 <p><br></p>
 <h2>Logistic Regression - <i>"What Features are Important?"</i></h2>            
 <p>I begin with 10 fold cross-validated logistic regression to obtain with l1 (ridge regression) and l2 (LASSO regression) regularization parameters.</p>
-<pre class = 'brush: python'>
+<pre class = 'brush: python'># Split into test and train datasets
 X_train, X_test, y_train, y_test = train_test_split(features, trueTarget, test_size = 0.2, random_state = 42)
 
+# 10 fold CV logistic regression
 crossVal = 10
-C = np.logspace(0,5,51)
+C = np.logspace(0,5,51) # sweep over regularization params
 LRCV = [LogisticRegressionCV(cv = crossVal, Cs = C, penalty = 'l1', solver = 'liblinear'),
         LogisticRegressionCV(cv = crossVal, Cs = C, penalty = 'l2', solver = 'liblinear')]
-   
+
 classif_rates = []
 for LR in LRCV: 
-    LR.fit(X_train, y_train)
-    y_pred = LR.predict(X_test)
+    LR.fit(X_train, y_train)     # fit model
+    y_pred = LR.predict(X_test)  # predict on test set
+    # find accuracy
     classif_rate = np.mean(y_pred.ravel() == y_test.ravel()) * 100
     classif_rates.append(classif_rate)
+    
+# Since both the same lets use l2 since all coeffs are preserved
 </pre>
 <p><br></p>
-<p>I end up with a accuracy score for both as 95.62% which were performed on the test set.</p>
+<p>I end up with a accuracy score for both l1 and l2 regularization parameters as 95.62% which were performed on the test set. I will continue with l2 regularization since all coefficients are preserved</p>
 <p><br></p>
 <h3>Performance diagnoses</h3>
+<p><br></p>
+<p>The learning vurve shows how the sample size affects the score -  sometimes more data insn't necessarily better. The learning curve can also help identify bias and variance in the model performance.</p>
+<p><br></p>
+<pre class = 'brush: python'>def plot_Learning_Curve(X_train, X_test, y_train, y_test, clf, res = 20):
+    """
+    Plots the training, test, and validation accuracies of a model as a
+    function of the 
+    """
+    train_len = X_train.shape[0]
+    samp_size = range(train_len//res, train_len, train_len//res)
+    
+    mean_scores, std_scores = [], []
+    scores_train, scores_test = [], []
+    
+    for sample in samp_size:
+        score = cross_val_score(clf, X_train.iloc[:int(sample)], y_train.iloc[:int(sample)], cv = 5)
+        mean_scores.append(np.mean(score) * 100)
+        std_scores.append(np.std(score) * 100)
+        clf.fit(X_train.iloc[:int(sample)], y_train.iloc[:int(sample)])
+        scores_train.append(np.mean(clf.predict(X_train.iloc[:int(sample)]).ravel() == y_train.iloc[:int(sample)].ravel()) * 100)
+        scores_test.append(np.mean(clf.predict(X_test.iloc[:int(sample)]).ravel() == y_test.iloc[:int(sample)].ravel()) * 100)
+    
+    fig = plt.figure(); plt.clf()
+    ax = fig.add_subplot(111)
+    ax = simpleaxis(ax)
+    plt.fill_between(samp_size, np.asarray(mean_scores) - np.asarray(std_scores),
+                         np.asarray(mean_scores) + np.asarray(std_scores), alpha=0.1,
+                         color="r", label = 'Validation')
+    plt.plot(samp_size, mean_scores, color = 'r', linewidth = 2, label = 'Validation')                     
+    plt.plot(samp_size, scores_train, 'b', linewidth = 2, label = 'Train')
+    plt.plot(samp_size, scores_test, 'g', linewidth = 2, label = 'Test')
+    plt.title('Learning Curve', size = 25)
+    plt.xticks(size = 20); plt.xlabel('Sample Size', size = 20)
+    plt.yticks(size = 20); plt.ylabel('Accuracy (%)', size = 20)
+    plt.legend(loc = 4, fontsize = 20)
+
+# Learning Curve =
+plot_Learning_Curve(X_train, X_test, y_train, y_test, clf = L2, res = 40)
+</pre>
+
 <div class = 'row'>
   <div class = 'col-sm-7'>
     <img class="img-responsive" src="figs/learning_curve.png" width = '95%'>
@@ -588,7 +656,25 @@ for LR in LRCV:
   </div>
 </div>                 
 
-<p>We can use the evaluation metrics <span class = 'math'>\(Precision = \frac{tp}{tp+fp}\)</span>, <span class = 'math'>\(Recall = \frac{tp}{tp+fn}\)</span>, <span class = 'math'>\(Precision = (Precision + Recall)/2)\)</span>, <span class = 'math'>\(tp\)</span> is the number of true positives, <span class = 'math'>\(fp\)</span> is the number of false positives, and <span class = 'math'>\(fn\)</span> is the number of false negatives.</p>
+<p>We can use the evaluation metrics <span class = 'math'>\(Precision = \frac{tp}{tp+fp}\)</span>, <span class = 'math'>\(Recall = \frac{tp}{tp+fn}\)</span>, <span class = 'math'>\(Precision = (Precision + Recall)/2)\)</span>, where <span class = 'math'>\(tp\)</span> is the number of true positives, <span class = 'math'>\(fp\)</span> is the number of false positives, and <span class = 'math'>\(fn\)</span> is the number of false negatives.</p>
+<p><br></p>
+<pre class="brush: python">def print_Eval_Metrics(y_pred, y_test):
+    """
+    Prints the accuracy, precision, recall and f1-score
+    """
+    prf = precision_recall_fscore_support(y_test, y_pred)
+    print('Accuracy: %s' % np.mean(y_pred.ravel() == y_test.ravel()))
+    print('Precision: %s' % prf[0][0])
+    print('Recall: %s' % prf[1][0])
+    print('f1-score: %s' % prf[2][0])
+
+L2 = LogisticRegression(penalty = 'l2', C = LR.C_[0])
+L2.fit(X_train, y_train)
+y_pred = L2.predict(X_test)
+
+# Evaluation metrics
+print_Eval_Metrics(y_pred, y_test)
+</pre>
 <p><br></p>
 <center><table class="table table-hover" style = "width:70%; font-size:160%; font-align:center;">
 <tr ><th>Accuracy</th><td>0.9562</td></tr>
@@ -692,13 +778,18 @@ plotROC(y_probs, L2.classes_)
 <p><br></p>
 <p>Plotting the feature coefficients for logistic regression tells us the relative importance of the features, in obtaining a true (malignant) observation prediction. Here We can see that bland chromatin, clump thickness, and mitoses are the most important features for predicting a malignant tumor. Whereas single epithelial cell size is not very important.</p>
 <p><br></p>
-<pre class="brush: python">
-sorted_coeffs = [y for (x,y) in sorted(zip(L2.coef_[0],colnames[1:-1]))]
-sorted_coeff_vals = sorted(L2.coef_[0])
+<pre class="brush: python">def plot_Feature_Importances(clf, featureNames):
+    """
+    Plots the sorted feaure importances
+    """
+    sorted_coeffs = [y for (x,y) in sorted(zip(clf.coef_[0], featureNames))]
+    sorted_coeff_vals = sorted(clf.coef_[0])
+    
+    plt.barh(range(len(sorted_coeff_vals)),sorted_coeff_vals, color = '#34495e')
+    plt.yticks(np.asarray(range(len(sorted_coeffs)))+0.5, sorted_coeffs)
 
-plt.figure();plt.clf()
-plt.barh(range(len(sorted_coeff_vals)),sorted_coeff_vals, color = '#34495e')
-plt.yticks(np.asarray(range(len(sorted_coeffs)))+0.5, sorted_coeffs)
+# Plot coeffs =
+plot_Feature_Importances(L2, colnames[1:-1])
 </pre>        	
 <p><br></p>
 <center><img src="figs/featureCoeffs.png" width = '95%'></center>
@@ -724,17 +815,20 @@ plt.yticks(np.asarray(range(len(sorted_coeffs)))+0.5, sorted_coeffs)
                   <p><br></p>
                   <p>The next strategy I use is decision trees, since they are also highly interpretable. If the depth of the trees are not deep the results can be determined without a computer, which may be advantageous in some situations. </p>
                   <p>We again create a model and create a confusion matrix and ROC plot. In determining the depth of the trees, more may not necessarily increase the accuracy, and a shallower depth is simpler, which can be advantageous.</p>
-                  <pre class="brush: python">
-DTC2 = tree.DecisionTreeClassifier(max_depth = 3, max_features = 9)
+                  <pre class="brush: python">DTC2 = tree.DecisionTreeClassifier(max_depth = 3, max_features = 9)
 DTC2.fit(X_train, y_train)
 y_pred_dtc = DTC2.predict(X_test)
-classif_rate = np.mean(y_pred_dtc.ravel() == y_test.ravel())*100
 
+# Print eval metrics =
+print_Eval_Metrics(y_pred_dtc, y_test)
+
+# Plot confusion matrix
 cnf_matrix_dtc = confusion_matrix(y_test, y_pred_dtc)
 plot_confusion_matrix(cnf_matrix_dtc, DTC2.classes_)
 
+# Plot ROC
 y_probs_dtc = DTC2.predict_proba(X_test)
-plotROC(y_probs_dtc, L2.classes_)
+plotROC(y_probs_dtc, DTC2.classes_)
 </pre>
 <p><br></p>
 <div class ='row'>
@@ -753,7 +847,7 @@ plotROC(y_probs_dtc, L2.classes_)
 <tr><th>F1-score</th><td>0.9383</td></tr>
 </table></center>
 <p>Using decision trees I suffer a little on the accuracy, obtaining 92.70% on the test set, however I am able to get a highly interpretable flow chart that can be followed by any member of the medical community that can administer the test.</p>
-<pre class="brush: python">
+<pre class="brush: python"># Plot decision tree
 dot_data = tree.export_graphviz(DTC2, out_file=None, feature_names = colnames[1:-1],
                                 class_names = DTC2.classes_, filled = True,
                                 rounded = True, special_characters = True) 
@@ -794,24 +888,38 @@ for clf in classifiers:
 </table></center>
 <p><br></p>
 <p>The linear kernel outperformed the radial basis function and is on par with logistic regression. We can see how the data performed on the test set.</p>
-<pre class = 'brush: python'>
+<pre class = 'brush: python'># set clsssifiers
+classifiers = [
+    SVC(kernel="linear", C = 0.025),
+    SVC(gamma=2, C=1)]
+
+# perform cross-validation
+scores = []
+for clf in classifiers:
+    score = cross_val_score(clf, X_train, y_train, cv = 5)
+    scores.append(score)
+    print("Model has accuracy: %0.5f (+/- %0.5f)" % (score.mean(), score.std() * 2))
+
+# fit models    
 clf_lin = classifiers[0]
 clf_rbf = classifiers[1]
 clf_lin.fit(X_train, y_train)
 clf_rbf.fit(X_train, y_train)
 
+# evaluate on test set
 y_pred_lin = clf_lin.predict(X_test)
 y_pred_rbf = clf_rbf.predict(X_test)
 
-prf_lin = precision_recall_fscore_support(y_test, y_pred_lin)
-print('Precision: %s' % prf_lin[0][0])
-print('Recall: %s' % prf_lin[1][0])
-print('f1-score: %s' % prf_lin[2][0])
+# Print evaluation metrics
+print_Eval_Metrics(y_pred_lin, y_test)
+print_Eval_Metrics(y_pred_rbf, y_test)
 
-prf_rbf = precision_recall_fscore_support(y_test, y_pred_rbf)
-print('Precision: %s' % prf_rbf[0][0])
-print('Recall: %s' % prf_rbf[1][0])
-print('f1-score: %s' % prf_rbf[2][0])
+# Plot confusion matrices
+cnf_matrix_lin = confusion_matrix(y_test, y_pred_lin)
+plot_confusion_matrix(cnf_matrix_lin, clf_lin.classes_)
+
+cnf_matrix_rbf = confusion_matrix(y_test, y_pred_rbf)
+plot_confusion_matrix(cnf_matrix_rbf, clf_rbf.classes_)
 </pre>
 <p><br></p>
 <h3 style = "text-align:center;">Test Metrics</h3>
