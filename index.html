@@ -397,6 +397,7 @@ p, .container .sideText5 p {
 	<div class="wrapper" id="header">
 <p><br></p>
 <h1 align="center" style = "margin: 0;"><big>Classifying Biopsied Breast Cells</big> or...</h1>
+<hr style="height:10px; visibility:hidden;" />
 <h1 align="center" style = "margin: 0;"><big>Bagging Breast Bumps</big></h1>
 <header>
     <hr class="star-light" style='background-color:white;'>
@@ -421,10 +422,11 @@ p, .container .sideText5 p {
           			
          	 			<div class="center">    
             				<h2>Approach</h2>  
+                    <p>{{ site.baseurl}}</p>
 								    <p>I am going to develop a classification model using the features provided. I will first focus on models that are highly interpretable, that will provide value by giving general rules with which to classify tumors that a person who actually conducts the tests can understand.</p>
-                    <p>If the distribution of classes is near equal I will use accuracy as the evaluation metric, wheras if they are highly skewed then I will use f1-score.</p>
-                    <p>I will begin with logistic regression and use cross-validation to choose the regularization parameter. I start with logistic regression because the results are easily interpretable. , which I believe would be of great value.</p>
-                    <p>Next, I would use other models such as decision trees which also have a high degree of interpretablitly, trees with small depth can be looked at as flowcharts with which to follow.</p>
+                    <p>In determining what is a If the distribution of classes is near equal I will use accuracy as the evaluation metric, wheras if they are highly skewed then I will use f1-score.</p>
+                    <p>I will begin with logistic regression and use cross-validation to choose the regularization parameters. I start with logistic regression because the results are easily interpretable. Someone conducting the tests on the tumors can have an idea on which features may be of greater importance in classifying the ype of tumor.</p>
+                    <p>Next, I would use other models such as decision trees which also have a high degree of interpretablitly, trees with small depth can be looked at as flowcharts with which to follow to determine the class of tumor is benign or malignant.</p>
                     <p>Finally, I will explore more complicated models such as support vector machines (SVMs), to see if a more complicated model can outperform a simpler one. </p>
                     <p><br></p>
             				<div class="left">
@@ -447,7 +449,7 @@ p, .container .sideText5 p {
           				<p><br></p>
         				<h2>Exploratory Data Analysis</h2>
               				<p><br></p>
-                      <p>Exploratory data analysis is performed in python to get a general feel for the data. First the libraries are installed. The data comes from <a href="https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-wisconsin/breast-cancer-wisconsin.data">The UCI machine learning repository</a>. The columns are given <a href="https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-wisconsin/breast-cancer-wisconsin.names">here</a> are as follows:</p>
+                      <p>An exploratory data analysis is performed in python to get a general feel for the data. First the libraries are imported. The data comes from <a href="https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-wisconsin/breast-cancer-wisconsin.data">The UCI machine learning repository</a>. The columns are given <a href="https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-wisconsin/breast-cancer-wisconsin.names">here</a> and are as follows:</p>
                       <br>
                 <table class="table table-hover" style = "width:100%; font-size:160%; font-align:center;">
                     <tr ><th>Column</th><th>Format</th></tr>
@@ -520,7 +522,7 @@ numMalig = sum(all_data_noNAs[10] == 4)/float(all_data_noNAs.shape[0])*100
 </pre>
 <p>If we look at the number of benign and malignant tumors in the total dataset it is a 65-35 split.</p>
 <p>We also see that there are a lot of '?', that correspond to missing values that are acknowledged in the <a href="https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-wisconsin/breast-cancer-wisconsin.names">documents provided</a>.</p>
-<p>For now we remove them sinnce they make up only 2.29% of the data.</p>
+<p>For now we remove them since they make up only 2.29% of the data. If there were a greater number of missing values or their remaining features followed a non-random distribution, i.e., they are correlated we may have to deal with missing values in another way, such as imputation. This may be as simple as setting the missing values to the mean, mode or median from the remaining values of feature.</p>
 <p>We can also look at the distribution of the various features using boxplots, and separate them by the target, whether they are benign or malignant.</p>
 <p><br></p>
 <center><img src="figs/eda1.png" width = "100%"></center>
