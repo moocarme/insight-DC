@@ -13,12 +13,7 @@ import numpy as np
 from sklearn.metrics import roc_curve, auc
 import matplotlib.pyplot as plt
 from sklearn.cross_validation import train_test_split
-from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
-from sklearn.naive_bayes import GaussianNB
-from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.cross_validation import cross_val_score
 from sklearn.linear_model import LogisticRegressionCV
 from sklearn.linear_model import LogisticRegression
@@ -73,6 +68,9 @@ def plot_confusion_matrix(cm, classes,
     plt.xlabel('Predicted label', size= 20)
 
 def plotROC(y_probs, classes):
+    """
+    This function plots the ROC of given probabilities
+    """
     fig = plt.figure(668);plt.clf()
     ax = fig.add_subplot(111)
     ax = simpleaxis(ax)
@@ -125,7 +123,11 @@ def plot_Learning_Curve(X_train, X_test, y_train, y_test, clf, res = 20):
     plt.yticks(size = 20); plt.ylabel('Accuracy (%)', size = 20)
     plt.legend(loc = 4, fontsize = 20)
 
-def plot_correlation_matrix(features, title = 'Correlation Matrix', cmap = plt.cm.RdBu):
+def plot_correlation_matrix(features, title = 'Correlation Matrix', cmap = plt.cm.RdBu_r):
+    """
+    This function plots the confusion matrix, which measures
+    the correlation between all the features of a dataframe.
+    """
     plt.figure(); plt.clf()
     plt.imshow(np.corrcoef(features.T), interpolation='nearest', cmap=cmap)
     plt.title(title, size = 25)
@@ -169,8 +171,6 @@ sns.set(font_scale = 5)
 plt.figure()
 g = sns.factorplot("Features", hue = 'Result', y="Count", data=df_long, kind="box")
 g.set_xticklabels(rotation=30)
-
-
 
 # ==================
 X_train, X_test, y_train, y_test = train_test_split(features, trueTarget, test_size = 0.2, random_state = 42)
@@ -257,4 +257,37 @@ for clf in classifiers:
     score = cross_val_score(clf, X_train, y_train, cv = 5)
     scores.append(score)
     print("Model has accuracy: %0.5f (+/- %0.5f)" % (score.mean(), score.std() * 2))
+
+clf_lin = classifiers[0]
+clf_rbf = classifiers[1]
+clf_lin.fit(X_train, y_train)
+clf_rbf.fit(X_train, y_train)
+
+y_pred_lin = clf_lin.predict(X_test)
+y_pred_rbf = clf_rbf.predict(X_test)
+
+classif_rate_lin = np.mean(y_pred_lin.ravel() == y_test.ravel())
+classif_rate_rbf = np.mean(y_pred_rbf.ravel() == y_test.ravel())
+
+prf_lin = precision_recall_fscore_support(y_test, y_pred_lin)
+print('Accuracy: %s' % classif_rate_lin)
+print('Precision: %s' % prf_lin[0][0])
+print('Recall: %s' % prf_lin[1][0])
+print('f1-score: %s' % prf_lin[2][0])
+
+prf_rbf = precision_recall_fscore_support(y_test, y_pred_rbf)
+print('Accuracy: %s' % classif_rate_rbf)
+print('Precision: %s' % prf_rbf[0][0])
+print('Recall: %s' % prf_rbf[1][0])
+print('f1-score: %s' % prf_rbf[2][0])
+
+cnf_matrix_lin = confusion_matrix(y_test, y_pred_lin)
+plot_confusion_matrix(cnf_matrix_lin, clf_lin.classes_)
+
+cnf_matrix_rbf = confusion_matrix(y_test, y_pred_rbf)
+plot_confusion_matrix(cnf_matrix_rbf, clf_rbf.classes_)
+
+y_probs_lin = clf_lin.predict_proba(X_test)
+plotROC(y_probs_lin, L2.classes_)
+
 # Logistic Regression l2 still wins

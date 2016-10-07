@@ -470,17 +470,16 @@ import numpy as np
 from sklearn.metrics import roc_curve, auc
 import matplotlib.pyplot as plt
 from sklearn.cross_validation import train_test_split
-from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
-from sklearn.naive_bayes import GaussianNB
-from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 from sklearn.cross_validation import cross_val_score
 from sklearn.linear_model import LogisticRegressionCV
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix
 import itertools
+from sklearn import tree
+import pydotplus
+from sklearn.metrics import precision_recall_fscore_support
+import seaborn as sns
                              </pre>
                         
  
@@ -488,7 +487,11 @@ import itertools
 <p>First we load in the data from the UCI repository URL</p>
 <p></p>
 
-<pre class= "brush: python">
+<pre class= "brush: python">colnames = ['id_number' ,'Clump_Thickness','Uniformity_of_Cell_Size', 
+            'Uniformity_of_Cell_Shape', 'Marginal_Adhesion', 'Single_Epithelial_Cell_Size', 
+            'Bare_Nuclei', 'Bland_Chromatin' ,'Normal_Nucleoli',
+            'Mitoses','Class']#: (2 for benign, 4 for malignant)
+            
 url = "https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-wisconsin/breast-cancer-wisconsin.data"
 s = requests.get(url).content
 all_data = pd.read_csv(io.StringIO(s.decode('utf-8')), header = None)
@@ -499,10 +502,9 @@ all_data.dtypes
 all_data[6].unique()
 
 all_data[all_data[6] == '?'].shape[0]/float(all_data.shape[0])*100
-
 all_data_noNAs = all_data.drop(all_data.index[all_data[6] == '?'], 0)
 all_data_noNAs[6] = all_data_noNAs[6].astype(int)
-
+ 
 numBelign = sum(all_data_noNAs[10] == 2)/float(all_data_noNAs.shape[0])*100
 numMalig = sum(all_data_noNAs[10] == 4)/float(all_data_noNAs.shape[0])*100
 </pre>
@@ -522,15 +524,27 @@ target = all_data_noNAs[10]
 features = all_data_noNAs.drop([0, 10], 1)
 
 target.unique()
-trueTarget = pd.Series(['benign' if result==2 else 'malignent' for result in target])
+trueTarget = pd.Series(['benign' if result==2 else 'malignent' for result in target], index = features.index)
 
-def plot_correlation_matrix(features, title = 'Correlation Matrix', cmap = plt.cm.RdBu):
+def plot_correlation_matrix(features, title = 'Correlation Matrix', cmap = plt.cm.RdBu_r):
+    """
+    This function plots the confusion matrix, which measures
+    the correlation between all the features of a dataframe.
+    """
     plt.figure(); plt.clf()
     plt.imshow(np.corrcoef(features.T), interpolation='nearest', cmap=cmap)
     plt.title(title, size = 25)
     plt.colorbar()
 
 plot_correlation_matrix(features)
+
+plotData = pd.concat([features, trueTarget], axis = 1, ignore_index = True)
+plotData.columns = colnames[1:-1]+['Result']
+df_long = pd.melt(plotData, 'Result', var_name="Features", value_name="Count")
+sns.set(font_scale = 5)
+plt.figure()
+g = sns.factorplot("Features", hue = 'Result', y="Count", data=df_long, kind="box")
+g.set_xticklabels(rotation=30)
 </pre>
 <p><br></p>
 <center><img class="img-responsive" src="figs/corr_matrix.png" width = '75%'></center>
@@ -592,12 +606,13 @@ for LR in LRCV:
     This function prints and plots the confusion matrix.
     Normalization can be applied by setting `normalize=True`.
     """
+    plt.figure(); plt.clf()
     plt.imshow(cm, interpolation='nearest', cmap=cmap)
-    plt.title(title)
+    plt.title(title, size = 25)
     plt.colorbar()
     tick_marks = np.arange(len(classes))
-    plt.xticks(tick_marks, classes, rotation=45)
-    plt.yticks(tick_marks, classes)
+    plt.xticks(tick_marks, classes, rotation=45, size = 20)
+    plt.yticks(tick_marks, classes, size = 20)
 
     if normalize:
         cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
@@ -611,33 +626,43 @@ for LR in LRCV:
     for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
         plt.text(j, i, cm[i, j],
                  horizontalalignment="center",
-                 color="white" if cm[i, j] > thresh else "black")
+                 color="white" if cm[i, j] > thresh else "black", size = 20)
 
     plt.tight_layout()
-    plt.ylabel('True label')
-    plt.xlabel('Predicted label')
+    plt.ylabel('True label', size= 20)
+    plt.xlabel('Predicted label', size= 20)
 
 def plotROC(y_probs, classes):
+    """
+    This function plots the ROC of given probabilities
+    """
     fig = plt.figure(668);plt.clf()
     ax = fig.add_subplot(111)
     ax = simpleaxis(ax)
     plt.plot([0, 1], [0, 1], '--', color=(0.6, 0.6, 0.6), label='Luck')
     
-    for i, class_ in enumerate(classes):
-        y_class_probs = [x[i] for x in y_probs]
-        fpr, tpr, thresholds = roc_curve(y_test, y_class_probs, pos_label = classes[i])
+    if len(classes) <= 2:
+        fpr, tpr, thresholds = roc_curve(y_test, y_probs[:,1], pos_label = classes[1])
         roc_auc = auc(fpr, tpr)    
-        plt.plot(fpr, tpr, lw=2, label='%s (area = %0.4f)' % (classes[i], roc_auc))
-    
+        plt.plot(fpr, tpr, lw=2, label='Positive: %s (area = %0.4f)' % (classes[1], roc_auc))
+    else:    
+        for i, class_ in enumerate(classes):
+            y_class_probs = [x[i] for x in y_probs]
+            fpr, tpr, thresholds = roc_curve(y_test, y_class_probs, pos_label = classes[i])
+            roc_auc = auc(fpr, tpr)    
+            plt.plot(fpr, tpr, lw=2, label='%s (area = %0.4f)' % (classes[i], roc_auc))
+        
     plt.xlim([-0.05, 1.05]); plt.ylim([-0.05, 1.05])
     plt.xlabel('False Positive Rate', size = 20); plt.xticks(size = 20)
     plt.ylabel('True Positive Rate', size = 20); plt.yticks(size = 20)
     plt.title('ROC Curve', size = 25)
     plt.legend(loc = "lower right", fontsize = 20); 
 
+
 L2 = LogisticRegression(penalty = 'l2', C = LR.C_[0])
 L2.fit(X_train, y_train)
 y_pred = L2.predict(X_test)
+
 cnf_matrix = confusion_matrix(y_test, y_pred)
 plot_confusion_matrix(cnf_matrix, L2.classes_)
 
@@ -828,7 +853,8 @@ print('f1-score: %s' % prf_rbf[2][0])
     			<article id="eight">
       				<div class="center">	
               			<h2>Conclusion</h2>
-                    <p>To conclude 3 models have been developed. Logistic regression is the overall best model incorporating evaluation metrics and interpretability of the feature importance. A decision tree model was also developed which has the benefit of ease of use in implementation, and could be suited for remote applications where the model can not be run by a computer. </p>
+                    <p>To conclude 3 models have been developed. Logistic regression is the overall best model incorporating evaluation metrics and interpretability of the feature importance. A decision tree model was also developed which has the benefit of ease of use in implementation, and could be suited for remote applications where the model can not be run by a computer.</p>
+                    <p>SVMs were also used because of its ability to capture complex relationships between the datapoints. Both linear and radial kernels performed well in their own ways - the linear kernel had perfec precision, but suffered a lot on the recall, the radial function on the other hand, exhibited the best evaluation metrics on the test data. However the model is not very intrepretable.</p>
               			<div class="left"> 	
                 			<div class="container">
                 				<div class="sideText4">
