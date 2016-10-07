@@ -48,7 +48,10 @@ address:
   - line: 390 Lorimer St
   - line: Brooklyn, NY 11206
 
+# Credits content
+credits: 'Freelancer is a free to use, open source Bootstrap theme created by <a href="http://startbootstrap.com">Start Bootstrap</a>.'
+
 # Build settings
 markdown: kramdown
-baseurl: /insight-DC
+baseurl: 
 permalink: pretty
