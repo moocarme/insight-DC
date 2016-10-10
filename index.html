@@ -614,7 +614,7 @@ for LR in LRCV:
 <p><br></p>
 <h3>Performance diagnoses</h3>
 <p><br></p>
-<p>The learning vurve shows how the sample size affects the score -  sometimes more data insn't necessarily better. The learning curve can also help identify bias and variance in the model performance.</p>
+<p>The learning curve shows how the sample size affects the model accuracy -  sometimes more data doesn't necessarily correlate to a more accurate prediction. The learning curve can also help identify bias and variance in the model performance.</p>
 <p><br></p>
 <pre class = 'brush: python'>def plot_Learning_Curve(X_train, X_test, y_train, y_test, clf, res = 20):
     """
@@ -782,7 +782,7 @@ plotROC(y_probs, L2.classes_)
   </div>
 </div>
 <p><br></p>
-<p>Plotting the feature coefficients for logistic regression tells us the relative importance of the features, in obtaining a true (malignant) observation prediction. Here We can see that bland chromatin, clump thickness, and mitoses are the most important features for predicting a malignant tumor. Whereas single epithelial cell size is not very important.</p>
+<p>Plotting the feature coefficients for logistic regression tells us the relative importance of the features, in obtaining a true (malignant) observation prediction. Here, we can see that bland chromatin, clump thickness, and mitoses are the most important features for predicting a malignant tumor. Whereas single epithelial cell size is not very important.</p>
 <p><br></p>
 <pre class="brush: python">def plot_Feature_Importances(clf, featureNames):
     """
@@ -819,8 +819,8 @@ plot_Feature_Importances(L2, colnames[1:-1])
       					<p><br></p>
           				<h2>Decision Trees - <i>"Just Tell Me What to Do!"</i></h2>
                   <p><br></p>
-                  <p>The next strategy I use is decision trees, since they are also highly interpretable. If the depth of the trees are not deep the results can be determined without a computer, which may be advantageous in some situations. </p>
-                  <p>We again create a model and create a confusion matrix and ROC plot. In determining the depth of the trees, more may not necessarily increase the accuracy, and a shallower depth is simpler, which can be advantageous.</p>
+                  <p>The next strategy I use is decision trees, since they are also highly interpretable. In fact, the results of the model can be generally be determined without a computer, which may be advantageous in some situations. </p>
+                  <p>We again create a model, compute a confusion matrix, and a ROC plot. In determining the depth of the trees, more may not necessarily increase the accuracy, though may increase the confidence via a reduction of the Gini coefficients. Moreover, a shallower depth is simpler, which can also be advantageous.</p>
                   <pre class="brush: python">DTC2 = tree.DecisionTreeClassifier(max_depth = 3, max_features = 9)
 DTC2.fit(X_train, y_train)
 y_pred_dtc = DTC2.predict(X_test)
@@ -852,7 +852,7 @@ plotROC(y_probs_dtc, DTC2.classes_)
 <tr><th>Recall</th><td>0.9620</td></tr>
 <tr><th>F1-score</th><td>0.9383</td></tr>
 </table></center>
-<p>Using decision trees I suffer a little on the accuracy, obtaining 92.70% on the test set, however I am able to get a highly interpretable flow chart that can be followed by any member of the medical community that can administer the test.</p>
+<p>Using decision trees I suffer a little on the accuracy, obtaining 92.70% on the test set, however I am able to get a highly interpretable flow chart that can be followed by any member of the medical community, which they can use to administer the classification test.</p>
 <pre class="brush: python"># Plot decision tree
 dot_data = tree.export_graphviz(DTC2, out_file=None, feature_names = colnames[1:-1],
                                 class_names = DTC2.classes_, filled = True,
@@ -874,7 +874,7 @@ graph.write_png("breastCancer.png")
 						<p><br></p>
 <h2>SVMs - <i>"More Complicated, More Better?"</i></h2>
 <p><br></p>
-<p>We can use SVMs to see if a more complicated model can result in a more accurate prediction</p>
+<p>We can use SVMs to see if a more complicated model can result in a more accurate prediction.</p>
 <pre class = 'brush: python'>
 classifiers = [
     SVC(kernel="linear", C=0.025),
