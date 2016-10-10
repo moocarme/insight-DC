@@ -20,7 +20,7 @@
     <link href="http://www.mattmoocar.me/insight-DC/css/shThemeDefault.css" rel="stylesheet" type="text/css" />
 		<link href="http://www.mattmoocar.me/insight-DC/css/bootstrap.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="http://www.mattmoocar.me/insight-DC/css/main.css">
-		<link rel="stylesheet" href="{{ site.baseurl}}/css/font-awesome/css/font-awesome.min.css">
+		<link rel="stylesheet" href="http://www.mattmoocar.me/insight-DC/css/font-awesome.min.css">
     <link href="https://afeld.github.io/emoji-css/emoji.css" rel="stylesheet">
 
 		<link rel="favicon-144-precomposed"  href="/img/profile.png">
@@ -40,6 +40,7 @@
         /***** BASE STYLES *****/ 
         h1{
           font-size: 200%;
+          font-family: 'JunctionRegular';
         }
 
         h2{
@@ -407,7 +408,7 @@ p, .container .sideText5 p {
               			<div>
               				<h2>Goal</h2>
                       <p>The task is to develop a model that predicts whether a biopsied breast cell is benign (not harmful) or malignant (cancerous), given a set of attributes about the cell. </p>
-                      <p>The complete jupyter notebook can be found on github <a target='_blank' href="https://github.com/moocarme/insight-DC">here</a>.</p>
+                      <p>The complete python script can be found on github <a target='_blank' href="https://github.com/moocarme/insight-DC/blob/master/breastCancerClassif.py">here</a>.</p>
               			</div>
               			<div class="left"></div>
       				</div>  
@@ -419,10 +420,10 @@ p, .container .sideText5 p {
           			
          	 			<div class="center">    
             				<h2>Approach</h2>  
-								    <p>I am going to develop a classification model using the features provided. I will first focus on models that are highly interpretable, that will provide value by giving general rules with which to classify tumors that a person who actually conducts the tests can understand.</p>
-                    <p>If the distribution of classes is near equal I will use accuracy as the evaluation metric, wheras if they are highly skewed then I will use f1-score.</p>
-                    <p>I will begin with logistic regression and use cross-validation to choose the regularization parameter. I start with logistic regression because the results are easily interpretable. , which I believe would be of great value.</p>
-                    <p>Next, I would use other models such as decision trees which also have a high degree of interpretablitly, trees with small depth can be looked at as flowcharts with which to follow.</p>
+                    <p>I am going to develop a classification model using the features provided. I will first focus on models that are highly interpretable, that will provide value by giving general rules with which to classify tumors that a person who actually conducts the tests can understand.</p>
+                    <p>In determining what is a If the distribution of classes is near equal I will use accuracy as the evaluation metric, wheras if they are highly skewed then I will use f1-score.</p>
+                    <p>I will begin with logistic regression and use cross-validation to choose the regularization parameters. I start with logistic regression because the results are easily interpretable. Someone conducting the tests on the tumors can have an idea on which features may be of greater importance in classifying the ype of tumor.</p>
+                    <p>Next, I would use other models such as decision trees which also have a high degree of interpretablitly, trees with small depth can be looked at as flowcharts with which to follow to determine the class of tumor is benign or malignant.</p>
                     <p>Finally, I will explore more complicated models such as support vector machines (SVMs), to see if a more complicated model can outperform a simpler one. </p>
                     <p><br></p>
             				<div class="left">
@@ -445,7 +446,7 @@ p, .container .sideText5 p {
           				<p><br></p>
         				<h2>Exploratory Data Analysis</h2>
               				<p><br></p>
-                      <p>Exploratory data analysis is performed in python to get a general feel for the data. First the libraries are installed. The data comes from <a href="https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-wisconsin/breast-cancer-wisconsin.data">The UCI machine learning repository</a>. The columns are given <a href="https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-wisconsin/breast-cancer-wisconsin.names">here</a> are as follows:</p>
+                      <p>An exploratory data analysis is performed in python to get a general feel for the data. First the libraries are imported. The data comes from <a href="https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-wisconsin/breast-cancer-wisconsin.data">The UCI machine learning repository</a>. The columns are given <a href="https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-wisconsin/breast-cancer-wisconsin.names">here</a> and are as follows:</p>
                       <br>
                 <table class="table table-hover" style = "width:100%; font-size:160%; font-align:center;">
                     <tr ><th>Column</th><th>Format</th></tr>
@@ -491,26 +492,34 @@ import seaborn as sns
             'Uniformity_of_Cell_Shape', 'Marginal_Adhesion', 'Single_Epithelial_Cell_Size', 
             'Bare_Nuclei', 'Bland_Chromatin' ,'Normal_Nucleoli',
             'Mitoses','Class']#: (2 for benign, 4 for malignant)
-            
+
+# url containing the data            
 url = "https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-wisconsin/breast-cancer-wisconsin.data"
 s = requests.get(url).content
+
+#grab the dats in csv format
 all_data = pd.read_csv(io.StringIO(s.decode('utf-8')), header = None)
 
+# exploratory data analysis
 all_data.shape
 
 all_data.dtypes
 all_data[6].unique()
-
+ 
+# how many values of ?
 all_data[all_data[6] == '?'].shape[0]/float(all_data.shape[0])*100
+
+# Not that many (~2.3%)so lets drop them and reformat
 all_data_noNAs = all_data.drop(all_data.index[all_data[6] == '?'], 0)
 all_data_noNAs[6] = all_data_noNAs[6].astype(int)
- 
+
+# count number benign and malignant
 numBelign = sum(all_data_noNAs[10] == 2)/float(all_data_noNAs.shape[0])*100
 numMalig = sum(all_data_noNAs[10] == 4)/float(all_data_noNAs.shape[0])*100
 </pre>
 <p>If we look at the number of benign and malignant tumors in the total dataset it is a 65-35 split.</p>
 <p>We also see that there are a lot of '?', that correspond to missing values that are acknowledged in the <a href="https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-wisconsin/breast-cancer-wisconsin.names">documents provided</a>.</p>
-<p>For now we remove them sinnce they make up only 2.29% of the data.</p>
+<p>For now we remove them since they make up only 2.29% of the data. If there were a greater number of missing values or their remaining features followed a non-random distribution, i.e., they are correlated we may have to deal with missing values in another way, such as imputation. This may be as simple as setting the missing values to the mean, mode or median from the remaining values of feature if the number of missing values is low. If there were more missing values, more complicated ways of imputing the data would be to use k-nearest neighbours, and choosing the value from the mean, or randomly from the distribution of the nearest neighbours.</p>
 <p>We can also look at the distribution of the various features using boxplots, and separate them by the target, whether they are benign or malignant.</p>
 <p><br></p>
 <center><img src="figs/eda1.png" width = "100%"></center>
@@ -518,12 +527,22 @@ numMalig = sum(all_data_noNAs[10] == 4)/float(all_data_noNAs.shape[0])*100
 <p>We see that the two classes vary distinctly in the various features, in which the majority of the benign tumors have values of 1, and malignant have distributions with larger means and higher standard deviations.</p>
 <p>Next we split the data into the feature set, and the target (which are trying to predict).</p>
 <p>We can also look at the correlation between features.</p>
+<p>Mathematically the correlation between features, <span class = 'math'>\(x_1\)</span>, and <span class = 'math'>\(x_2\)</span> as:</p>
+<div style="text-align: center;">
+<p> <span class = 'math'>\(r_{xy} = \frac{\sum_{i=1}^n(x_{1i}-\bar{x}_1)(x_{2i}-\bar{x}_2)} {\sqrt{\sum_{i=1}^n(x_{1i}-\bar{x}_1)^2\sum_{i=1}^n(x_{2i}-\bar{x}_2)^2}}\)</span></p>
+</div>
+<div style="text-align: right;">
+  <p>Thanks Carlos <i class="em em-smiley"></i> </p>
+</div>
 <p><br></p>
-<pre class = 'brush: python'>
+<pre class = 'brush: python'># create target and features dataset
 target = all_data_noNAs[10]
 features = all_data_noNAs.drop([0, 10], 1)
 
+#check for consistency
 target.unique()
+
+# convert to interpretable results (and to check we dont treat as numerical values)
 trueTarget = pd.Series(['benign' if result==2 else 'malignent' for result in target], index = features.index)
 
 def plot_correlation_matrix(features, title = 'Correlation Matrix', cmap = plt.cm.RdBu_r):
@@ -538,13 +557,25 @@ def plot_correlation_matrix(features, title = 'Correlation Matrix', cmap = plt.c
 
 plot_correlation_matrix(features)
 
-plotData = pd.concat([features, trueTarget], axis = 1, ignore_index = True)
-plotData.columns = colnames[1:-1]+['Result']
-df_long = pd.melt(plotData, 'Result', var_name="Features", value_name="Count")
-sns.set(font_scale = 5)
-plt.figure()
-g = sns.factorplot("Features", hue = 'Result', y="Count", data=df_long, kind="box")
-g.set_xticklabels(rotation=30)
+def plot_Features_Box_Plot(features, target, colnames = None):
+    """
+    This function makes a Boxplot from the various features, separated by
+    target column
+    """
+    assert (features.shape[0] == target.shape[0]), "Feature set and target set have different observations"
+    if colnames:
+        assert ((len(colnames) - 1) == features.shape[1]), "Colnames should have same length as number of columns of features and target combined"
+    else:
+        colnames = range(features.shape[1] + 1)
+    plotData = pd.concat([features, target], axis = 1, ignore_index = True)
+    plotData.columns = colnames[:-1]+['Result']
+    df_long = pd.melt(plotData, 'Result', var_name="Features", value_name="Count")
+    sns.set(font_scale = 1.5)
+    g = sns.factorplot("Features", hue = 'Result', y="Count", data=df_long, kind="box")
+    g.set_xticklabels(rotation=30)
+
+# Plot correlation between features 
+plot_Features_Box_Plot(features, trueTarget, colnames[1:])
 </pre>
 <p><br></p>
 <center><img class="img-responsive" src="figs/corr_matrix.png" width = '75%'></center>
@@ -559,25 +590,69 @@ g.set_xticklabels(rotation=30)
                 <p><br></p>
 <h2>Logistic Regression - <i>"What Features are Important?"</i></h2>            
 <p>I begin with 10 fold cross-validated logistic regression to obtain with l1 (ridge regression) and l2 (LASSO regression) regularization parameters.</p>
-<pre class = 'brush: python'>
+<pre class = 'brush: python'># Split into test and train datasets
 X_train, X_test, y_train, y_test = train_test_split(features, trueTarget, test_size = 0.2, random_state = 42)
 
+# 10 fold CV logistic regression
 crossVal = 10
-C = np.logspace(0,5,51)
+C = np.logspace(0,5,51) # sweep over regularization params
 LRCV = [LogisticRegressionCV(cv = crossVal, Cs = C, penalty = 'l1', solver = 'liblinear'),
         LogisticRegressionCV(cv = crossVal, Cs = C, penalty = 'l2', solver = 'liblinear')]
-   
+
 classif_rates = []
 for LR in LRCV: 
-    LR.fit(X_train, y_train)
-    y_pred = LR.predict(X_test)
+    LR.fit(X_train, y_train)     # fit model
+    y_pred = LR.predict(X_test)  # predict on test set
+    # find accuracy
     classif_rate = np.mean(y_pred.ravel() == y_test.ravel()) * 100
     classif_rates.append(classif_rate)
+    
+# Since both the same lets use l2 since all coeffs are preserved
 </pre>
 <p><br></p>
-<p>I end up with a accuracy score for both as 95.62% which were performed on the test set.</p>
+<p>I end up with a accuracy score for both l1 and l2 regularization parameters as 95.62% which were performed on the test set. I will continue with l2 regularization since all coefficients are preserved</p>
 <p><br></p>
 <h3>Performance diagnoses</h3>
+<p><br></p>
+<p>The learning vurve shows how the sample size affects the score -  sometimes more data insn't necessarily better. The learning curve can also help identify bias and variance in the model performance.</p>
+<p><br></p>
+<pre class = 'brush: python'>def plot_Learning_Curve(X_train, X_test, y_train, y_test, clf, res = 20):
+    """
+    Plots the training, test, and validation accuracies of a model as a
+    function of the 
+    """
+    train_len = X_train.shape[0]
+    samp_size = range(train_len//res, train_len, train_len//res)
+    
+    mean_scores, std_scores = [], []
+    scores_train, scores_test = [], []
+    
+    for sample in samp_size:
+        score = cross_val_score(clf, X_train.iloc[:int(sample)], y_train.iloc[:int(sample)], cv = 5)
+        mean_scores.append(np.mean(score) * 100)
+        std_scores.append(np.std(score) * 100)
+        clf.fit(X_train.iloc[:int(sample)], y_train.iloc[:int(sample)])
+        scores_train.append(np.mean(clf.predict(X_train.iloc[:int(sample)]).ravel() == y_train.iloc[:int(sample)].ravel()) * 100)
+        scores_test.append(np.mean(clf.predict(X_test.iloc[:int(sample)]).ravel() == y_test.iloc[:int(sample)].ravel()) * 100)
+    
+    fig = plt.figure(); plt.clf()
+    ax = fig.add_subplot(111)
+    ax = simpleaxis(ax)
+    plt.fill_between(samp_size, np.asarray(mean_scores) - np.asarray(std_scores),
+                         np.asarray(mean_scores) + np.asarray(std_scores), alpha=0.1,
+                         color="r", label = 'Validation')
+    plt.plot(samp_size, mean_scores, color = 'r', linewidth = 2, label = 'Validation')                     
+    plt.plot(samp_size, scores_train, 'b', linewidth = 2, label = 'Train')
+    plt.plot(samp_size, scores_test, 'g', linewidth = 2, label = 'Test')
+    plt.title('Learning Curve', size = 25)
+    plt.xticks(size = 20); plt.xlabel('Sample Size', size = 20)
+    plt.yticks(size = 20); plt.ylabel('Accuracy (%)', size = 20)
+    plt.legend(loc = 4, fontsize = 20)
+
+# Learning Curve =
+plot_Learning_Curve(X_train, X_test, y_train, y_test, clf = L2, res = 40)
+</pre>
+<p><br></p>
 <div class = 'row'>
   <div class = 'col-sm-7'>
     <img class="img-responsive" src="figs/learning_curve.png" width = '95%'>
@@ -586,8 +661,26 @@ for LR in LRCV:
     <p>If we look at the learning curve of the model we can see that the model plateaus around a training size of 250, and there is little bias and little variance, which is good <i class="em em-smiley"></i><i class="em em-smiley"></i><i class="em em-smiley"></i> </p>
   </div>
 </div>                 
+<p><br></p>
+<p>We can use the evaluation metrics <span class = 'math'>\(Precision = \frac{tp}{tp+fp}\)</span>, <span class = 'math'>\(Recall = \frac{tp}{tp+fn}\)</span>, <span class = 'math'>\(Precision = (Precision + Recall)/2)\)</span>, where <span class = 'math'>\(tp\)</span> is the number of true positives, <span class = 'math'>\(fp\)</span> is the number of false positives, and <span class = 'math'>\(fn\)</span> is the number of false negatives.</p>
+<p><br></p>
+<pre class="brush: python">def print_Eval_Metrics(y_pred, y_test):
+    """
+    Prints the accuracy, precision, recall and f1-score
+    """
+    prf = precision_recall_fscore_support(y_test, y_pred)
+    print('Accuracy: %s' % np.mean(y_pred.ravel() == y_test.ravel()))
+    print('Precision: %s' % prf[0][0])
+    print('Recall: %s' % prf[1][0])
+    print('f1-score: %s' % prf[2][0])
 
-<p>We can use the evaluation metrics <span class = 'math'>\(Precision = \frac{tp}{tp+fp}\)</span>, <span class = 'math'>\(Recall = \frac{tp}{tp+fn}\)</span>, <span class = 'math'>\(Precision = (Precision + Recall)/2)\)</span>, <span class = 'math'>\(tp\)</span> is the number of true positives, <span class = 'math'>\(fp\)</span> is the number of false positives, and <span class = 'math'>\(fn\)</span> is the number of false negatives.</p>
+L2 = LogisticRegression(penalty = 'l2', C = LR.C_[0])
+L2.fit(X_train, y_train)
+y_pred = L2.predict(X_test)
+
+# Evaluation metrics
+print_Eval_Metrics(y_pred, y_test)
+</pre>
 <p><br></p>
 <center><table class="table table-hover" style = "width:70%; font-size:160%; font-align:center;">
 <tr ><th>Accuracy</th><td>0.9562</td></tr>
@@ -631,6 +724,17 @@ for LR in LRCV:
     plt.tight_layout()
     plt.ylabel('True label', size= 20)
     plt.xlabel('Predicted label', size= 20)
+
+def simpleaxis(ax):
+   """
+   This function removes spines for a cleaner plot - Thanks Hugo! 
+   """
+   ax.spines['top'].set_visible(False)
+   ax.spines['right'].set_visible(False)
+   ax.get_xaxis().tick_bottom()
+   ax.get_yaxis().tick_left()
+   ax.xaxis.set_tick_params(size=6)
+   ax.yaxis.set_tick_params(size=6)
 
 def plotROC(y_probs, classes):
     """
@@ -680,13 +784,18 @@ plotROC(y_probs, L2.classes_)
 <p><br></p>
 <p>Plotting the feature coefficients for logistic regression tells us the relative importance of the features, in obtaining a true (malignant) observation prediction. Here We can see that bland chromatin, clump thickness, and mitoses are the most important features for predicting a malignant tumor. Whereas single epithelial cell size is not very important.</p>
 <p><br></p>
-<pre class="brush: python">
-sorted_coeffs = [y for (x,y) in sorted(zip(L2.coef_[0],colnames[1:-1]))]
-sorted_coeff_vals = sorted(L2.coef_[0])
+<pre class="brush: python">def plot_Feature_Importances(clf, featureNames):
+    """
+    Plots the sorted feaure importances
+    """
+    sorted_coeffs = [y for (x,y) in sorted(zip(clf.coef_[0], featureNames))]
+    sorted_coeff_vals = sorted(clf.coef_[0])
+    
+    plt.barh(range(len(sorted_coeff_vals)),sorted_coeff_vals, color = '#34495e')
+    plt.yticks(np.asarray(range(len(sorted_coeffs)))+0.5, sorted_coeffs)
 
-plt.figure();plt.clf()
-plt.barh(range(len(sorted_coeff_vals)),sorted_coeff_vals, color = '#34495e')
-plt.yticks(np.asarray(range(len(sorted_coeffs)))+0.5, sorted_coeffs)
+# Plot coeffs =
+plot_Feature_Importances(L2, colnames[1:-1])
 </pre>        	
 <p><br></p>
 <center><img src="figs/featureCoeffs.png" width = '95%'></center>
@@ -712,17 +821,20 @@ plt.yticks(np.asarray(range(len(sorted_coeffs)))+0.5, sorted_coeffs)
                   <p><br></p>
                   <p>The next strategy I use is decision trees, since they are also highly interpretable. If the depth of the trees are not deep the results can be determined without a computer, which may be advantageous in some situations. </p>
                   <p>We again create a model and create a confusion matrix and ROC plot. In determining the depth of the trees, more may not necessarily increase the accuracy, and a shallower depth is simpler, which can be advantageous.</p>
-                  <pre class="brush: python">
-DTC2 = tree.DecisionTreeClassifier(max_depth = 3, max_features = 9)
+                  <pre class="brush: python">DTC2 = tree.DecisionTreeClassifier(max_depth = 3, max_features = 9)
 DTC2.fit(X_train, y_train)
 y_pred_dtc = DTC2.predict(X_test)
-classif_rate = np.mean(y_pred_dtc.ravel() == y_test.ravel())*100
 
+# Print eval metrics =
+print_Eval_Metrics(y_pred_dtc, y_test)
+
+# Plot confusion matrix
 cnf_matrix_dtc = confusion_matrix(y_test, y_pred_dtc)
 plot_confusion_matrix(cnf_matrix_dtc, DTC2.classes_)
 
+# Plot ROC
 y_probs_dtc = DTC2.predict_proba(X_test)
-plotROC(y_probs_dtc, L2.classes_)
+plotROC(y_probs_dtc, DTC2.classes_)
 </pre>
 <p><br></p>
 <div class ='row'>
@@ -741,7 +853,7 @@ plotROC(y_probs_dtc, L2.classes_)
 <tr><th>F1-score</th><td>0.9383</td></tr>
 </table></center>
 <p>Using decision trees I suffer a little on the accuracy, obtaining 92.70% on the test set, however I am able to get a highly interpretable flow chart that can be followed by any member of the medical community that can administer the test.</p>
-<pre class="brush: python">
+<pre class="brush: python"># Plot decision tree
 dot_data = tree.export_graphviz(DTC2, out_file=None, feature_names = colnames[1:-1],
                                 class_names = DTC2.classes_, filled = True,
                                 rounded = True, special_characters = True) 
@@ -782,24 +894,38 @@ for clf in classifiers:
 </table></center>
 <p><br></p>
 <p>The linear kernel outperformed the radial basis function and is on par with logistic regression. We can see how the data performed on the test set.</p>
-<pre class = 'brush: python'>
+<pre class = 'brush: python'># set clsssifiers
+classifiers = [
+    SVC(kernel="linear", C = 0.025),
+    SVC(gamma=2, C=1)]
+
+# perform cross-validation
+scores = []
+for clf in classifiers:
+    score = cross_val_score(clf, X_train, y_train, cv = 5)
+    scores.append(score)
+    print("Model has accuracy: %0.5f (+/- %0.5f)" % (score.mean(), score.std() * 2))
+
+# fit models    
 clf_lin = classifiers[0]
 clf_rbf = classifiers[1]
 clf_lin.fit(X_train, y_train)
 clf_rbf.fit(X_train, y_train)
 
+# evaluate on test set
 y_pred_lin = clf_lin.predict(X_test)
 y_pred_rbf = clf_rbf.predict(X_test)
 
-prf_lin = precision_recall_fscore_support(y_test, y_pred_lin)
-print('Precision: %s' % prf_lin[0][0])
-print('Recall: %s' % prf_lin[1][0])
-print('f1-score: %s' % prf_lin[2][0])
+# Print evaluation metrics
+print_Eval_Metrics(y_pred_lin, y_test)
+print_Eval_Metrics(y_pred_rbf, y_test)
 
-prf_rbf = precision_recall_fscore_support(y_test, y_pred_rbf)
-print('Precision: %s' % prf_rbf[0][0])
-print('Recall: %s' % prf_rbf[1][0])
-print('f1-score: %s' % prf_rbf[2][0])
+# Plot confusion matrices
+cnf_matrix_lin = confusion_matrix(y_test, y_pred_lin)
+plot_confusion_matrix(cnf_matrix_lin, clf_lin.classes_)
+
+cnf_matrix_rbf = confusion_matrix(y_test, y_pred_rbf)
+plot_confusion_matrix(cnf_matrix_rbf, clf_rbf.classes_)
 </pre>
 <p><br></p>
 <h3 style = "text-align:center;">Test Metrics</h3>
@@ -822,9 +948,57 @@ print('f1-score: %s' % prf_rbf[2][0])
   </div>
 </div>
 <p><br></p>
-<p>We see that the linear kernel SVM performs much better than the radial basis function in terms of recall, however the radial basis function had perfect precision indicating that the radial basis function had a large number of false negatives. In cerain situations this may be desired, since every malignant tumor is classified correctly.</p>
-  <p>Though we are able to beat the scores of logistic regression by about 1% across all metrics, whether the slight increase in accuracy is beneficial over the interpretability is to be discussed with the implementers of the model.</p>
-						
+<p>We see that the linear kernel SVM performs much better than the radial basis function in terms of recall, however the radial basis function had perfect precision indicating that the radial basis function had a large number of false negatives. In cerain situations this may be desired, since every malignant tumor is classified correctly. An example would be when tests are cheap, and you don't mind telling people they have cancer when they don't. For this reason recall is generally considered a more appropriate evaluation metric for this type of problem.</p>
+<p>Though we are able to beat the scores of logistic regression by about 1% across all metrics, whether the slight increase in accuracy is beneficial over the interpretability is to be discussed with the implementers of the model. It is important to note tha this increase of just over 1% represents a correct classification of 2 datapoints over logistic regression due to the small sample size. </p>
+<h3>Visualizing SVMs</h3>
+<p>For greater understanding, we can use PCA we can map the features onto 2 principal components and plot the boundaries formed by the SVM. It is important to note that the SVM models fitted are different to those calculated above since they are computed from just two principle components calculated from PCA opposed to all 9.</p>
+<p><br></p>
+<pre class='brush: python'>def plot_PCA_boundary(clf, features, target):
+    """
+    Fit and plot PCA with boundary
+    """
+    t1 = PCA(n_components = 2).fit_transform(features)
+    clf.fit(t1, target)
+    
+    h = .02  # step size in the mesh
+    x_min, x_max = t1[:, 0].min() - 1, t1[:, 0].max() + 1
+    y_min, y_max = t1[:, 1].min() - 1, t1[:, 1].max() + 1
+    xx, yy = np.meshgrid(np.arange(x_min, x_max, h),
+                         np.arange(y_min, y_max, h))
+    
+    Z_proba = clf.predict_proba(np.c_[xx.ravel(), yy.ravel()])
+    
+    Z_mal = Z_proba[:,0].reshape(xx.shape)
+    Z_ben = Z_proba[:,1].reshape(xx.shape)
+    
+    t2 = np.column_stack([t1, trueTarget])
+    t3 =pd.DataFrame(data = t2)
+    t3.columns=['First Principle Component','Second Principle Component','Class']
+    result = sns.lmplot(x='First Principle Component', y='Second Principle Component', \
+               hue='Class', data = t3, palette = 'hls', fit_reg=False)
+    ax_res = result.ax
+    ax_res.contourf(xx, yy, Z_mal, cmap=plt.cm.Reds, alpha=0.25)
+    ax_res.contourf(xx, yy, Z_ben, cmap=plt.cm.Blues, alpha=0.25)
+
+clf_rbf2 = SVC(gamma=2, C=1, probability = True)
+clf_lin2 = SVC(kernel="linear", C = 0.025, probability = True)
+
+plot_PCA_boundary(clf_rbf2, features, trueTarget)
+plot_PCA_boundary(clf_lin2, features, trueTarget)
+</pre>
+<p><br></p>
+<div class= 'row'>
+  <div class = 'col-sm-6'>
+    <h4>Linear Kernel</h4>
+    <img class="img-responsive" src="figs/svm_lin_boundary.png" width = '95%' >
+  </div>
+  <div class = 'col-sm-6'>
+    <h4>Radial Basis Function Kernel</h4>
+    <img class="img-responsive" src="figs/svm_rbf_boundary.png" width = '95%' >
+  </div>
+</div>
+<p><br></p>
+<p>We can see that the radial boundary function does a much better job fitting the data sincce it is able to pick up the outliers for the benign class that the linear kernel cannot do.</p>
           				<div class="left">
             				<p></p> 
             				<div class="container">
@@ -854,7 +1028,7 @@ print('f1-score: %s' % prf_rbf[2][0])
       				<div class="center">	
               			<h2>Conclusion</h2>
                     <p>To conclude 3 models have been developed. Logistic regression is the overall best model incorporating evaluation metrics and interpretability of the feature importance. A decision tree model was also developed which has the benefit of ease of use in implementation, and could be suited for remote applications where the model can not be run by a computer.</p>
-                    <p>SVMs were also used because of its ability to capture complex relationships between the datapoints. Both linear and radial kernels performed well in their own ways - the linear kernel had perfec precision, but suffered a lot on the recall, the radial function on the other hand, exhibited the best evaluation metrics on the test data. However the model is not very intrepretable.</p>
+                    <p>SVMs were also used because of its ability to capture complex relationships between the datapoints. Both linear and radial kernels performed well in their own ways - the linear kernel had perfect precision, but suffered a lot on the recall, the radial function on the other hand, exhibited the best evaluation metrics on the test data, however the model is not very intrepretable.</p>
               			<div class="left"> 	
                 			<div class="container">
                 				<div class="sideText4">

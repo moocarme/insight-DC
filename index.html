@@ -20,7 +20,7 @@
     <link href="http://www.mattmoocar.me/insight-DC/css/shThemeDefault.css" rel="stylesheet" type="text/css" />
 		<link href="http://www.mattmoocar.me/insight-DC/css/bootstrap.css" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="http://www.mattmoocar.me/insight-DC/css/main.css">
-		<link rel="stylesheet" href="{{ site.baseurl}}/css/font-awesome/css/font-awesome.min.css">
+		<link rel="stylesheet" href="http://www.mattmoocar.me/insight-DC/css/font-awesome.min.css">
     <link href="https://afeld.github.io/emoji-css/emoji.css" rel="stylesheet">
 
 		<link rel="favicon-144-precomposed"  href="/img/profile.png">
@@ -527,6 +527,13 @@ numMalig = sum(all_data_noNAs[10] == 4)/float(all_data_noNAs.shape[0])*100
 <p>We see that the two classes vary distinctly in the various features, in which the majority of the benign tumors have values of 1, and malignant have distributions with larger means and higher standard deviations.</p>
 <p>Next we split the data into the feature set, and the target (which are trying to predict).</p>
 <p>We can also look at the correlation between features.</p>
+<p>Mathematically the correlation between features, <span class = 'math'>\(x_1\)</span>, and <span class = 'math'>\(x_2\)</span> as:</p>
+<div style="text-align: center;">
+<p> <span class = 'math'>\(r_{xy} = \frac{\sum_{i=1}^n(x_{1i}-\bar{x}_1)(x_{2i}-\bar{x}_2)} {\sqrt{\sum_{i=1}^n(x_{1i}-\bar{x}_1)^2\sum_{i=1}^n(x_{2i}-\bar{x}_2)^2}}\)</span></p>
+</div>
+<div style="text-align: right;">
+  <p>Thanks Carlos <i class="em em-smiley"></i> </p>
+</div>
 <p><br></p>
 <pre class = 'brush: python'># create target and features dataset
 target = all_data_noNAs[10]
@@ -645,7 +652,7 @@ for LR in LRCV:
 # Learning Curve =
 plot_Learning_Curve(X_train, X_test, y_train, y_test, clf = L2, res = 40)
 </pre>
-
+<p><br></p>
 <div class = 'row'>
   <div class = 'col-sm-7'>
     <img class="img-responsive" src="figs/learning_curve.png" width = '95%'>
@@ -654,7 +661,7 @@ plot_Learning_Curve(X_train, X_test, y_train, y_test, clf = L2, res = 40)
     <p>If we look at the learning curve of the model we can see that the model plateaus around a training size of 250, and there is little bias and little variance, which is good <i class="em em-smiley"></i><i class="em em-smiley"></i><i class="em em-smiley"></i> </p>
   </div>
 </div>                 
-
+<p><br></p>
 <p>We can use the evaluation metrics <span class = 'math'>\(Precision = \frac{tp}{tp+fp}\)</span>, <span class = 'math'>\(Recall = \frac{tp}{tp+fn}\)</span>, <span class = 'math'>\(Precision = (Precision + Recall)/2)\)</span>, where <span class = 'math'>\(tp\)</span> is the number of true positives, <span class = 'math'>\(fp\)</span> is the number of false positives, and <span class = 'math'>\(fn\)</span> is the number of false negatives.</p>
 <p><br></p>
 <pre class="brush: python">def print_Eval_Metrics(y_pred, y_test):
@@ -944,7 +951,7 @@ plot_confusion_matrix(cnf_matrix_rbf, clf_rbf.classes_)
 <p>We see that the linear kernel SVM performs much better than the radial basis function in terms of recall, however the radial basis function had perfect precision indicating that the radial basis function had a large number of false negatives. In cerain situations this may be desired, since every malignant tumor is classified correctly. An example would be when tests are cheap, and you don't mind telling people they have cancer when they don't. For this reason recall is generally considered a more appropriate evaluation metric for this type of problem.</p>
 <p>Though we are able to beat the scores of logistic regression by about 1% across all metrics, whether the slight increase in accuracy is beneficial over the interpretability is to be discussed with the implementers of the model. It is important to note tha this increase of just over 1% represents a correct classification of 2 datapoints over logistic regression due to the small sample size. </p>
 <h3>Visualizing SVMs</h3>
-<p>For greater understanding, we can use PCA we can map the features onto 2 principal components and plot the boundaries formed by the SVM.</p>
+<p>For greater understanding, we can use PCA we can map the features onto 2 principal components and plot the boundaries formed by the SVM. It is important to note that the SVM models fitted are different to those calculated above since they are computed from just two principle components calculated from PCA opposed to all 9.</p>
 <p><br></p>
 <pre class='brush: python'>def plot_PCA_boundary(clf, features, target):
     """
@@ -1021,7 +1028,7 @@ plot_PCA_boundary(clf_lin2, features, trueTarget)
       				<div class="center">	
               			<h2>Conclusion</h2>
                     <p>To conclude 3 models have been developed. Logistic regression is the overall best model incorporating evaluation metrics and interpretability of the feature importance. A decision tree model was also developed which has the benefit of ease of use in implementation, and could be suited for remote applications where the model can not be run by a computer.</p>
-                    <p>SVMs were also used because of its ability to capture complex relationships between the datapoints. Both linear and radial kernels performed well in their own ways - the linear kernel had perfec precision, but suffered a lot on the recall, the radial function on the other hand, exhibited the best evaluation metrics on the test data. However the model is not very intrepretable.</p>
+                    <p>SVMs were also used because of its ability to capture complex relationships between the datapoints. Both linear and radial kernels performed well in their own ways - the linear kernel had perfect precision, but suffered a lot on the recall, the radial function on the other hand, exhibited the best evaluation metrics on the test data, however the model is not very intrepretable.</p>
               			<div class="left"> 	
                 			<div class="container">
                 				<div class="sideText4">

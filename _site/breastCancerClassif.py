@@ -5,6 +5,7 @@ Created on Thu Oct  6 11:23:33 2016
 
 @author: matt-666
 """
+# Import libraries
 
 import pandas as pd
 import requests
@@ -23,15 +24,22 @@ from sklearn import tree
 import pydotplus
 from sklearn.metrics import precision_recall_fscore_support
 import seaborn as sns
+from sklearn.decomposition import PCA
+from sklearn.cross_decomposition import CCA
+from sklearn import manifold
+import time
 
 # Helper Functions =================================================
 def simpleaxis(ax):
-   ax.spines['top'].set_visible(False)
-   ax.spines['right'].set_visible(False)
-   ax.get_xaxis().tick_bottom()
-   ax.get_yaxis().tick_left()
-   ax.xaxis.set_tick_params(size=6)
-   ax.yaxis.set_tick_params(size=6)
+    """
+    This function removes spines for a cleaner plot - Thanks Hugo! 
+    """
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+    ax.get_xaxis().tick_bottom()
+    ax.get_yaxis().tick_left()
+    ax.xaxis.set_tick_params(size=6)
+    ax.yaxis.set_tick_params(size=6)
 
 def plot_confusion_matrix(cm, classes,
                           normalize=False,
@@ -95,6 +103,10 @@ def plotROC(y_probs, classes):
 
 
 def plot_Learning_Curve(X_train, X_test, y_train, y_test, clf, res = 20):
+    """
+    Plots the training, test, and validation accuracies of a model as a
+    function of the 
+    """
     train_len = X_train.shape[0]
     samp_size = range(train_len//res, train_len, train_len//res)
     
@@ -132,162 +144,278 @@ def plot_correlation_matrix(features, title = 'Correlation Matrix', cmap = plt.c
     plt.imshow(np.corrcoef(features.T), interpolation='nearest', cmap=cmap)
     plt.title(title, size = 25)
     plt.colorbar()
+    
+def plot_Features_Box_Plot(features, target, colnames = None):
+    """
+    This function makes a Boxplot from the various features, separated by
+    target column
+    """
+    assert (features.shape[0] == target.shape[0]), "Feature set and target set have different observations"
+    if colnames:
+        assert ((len(colnames) - 1) == features.shape[1]), "Colnames should have same length as number of columns of features and target combined"
+    else:
+        colnames = range(features.shape[1] + 1)
+    plotData = pd.concat([features, target], axis = 1, ignore_index = True)
+    plotData.columns = colnames[:-1]+['Result']
+    df_long = pd.melt(plotData, 'Result', var_name="Features", value_name="Count")
+    sns.set(font_scale = 1.5)
+    g = sns.factorplot("Features", hue = 'Result', y="Count", data=df_long, kind="box")
+    g.set_xticklabels(rotation=30)
+    
+def print_Eval_Metrics(y_pred, y_test):
+    """
+    Prints the accuracy, precision, recall and f1-score
+    """
+    prf = precision_recall_fscore_support(y_test, y_pred)
+    print('Accuracy: %s' % np.mean(y_pred.ravel() == y_test.ravel()))
+    print('Precision: %s' % prf[0][0])
+    print('Recall: %s' % prf[1][0])
+    print('f1-score: %s' % prf[2][0])
+
+def plot_Feature_Importances(clf, featureNames):
+    """
+    Plots the sorted feaure importances
+    """
+    sorted_coeffs = [y for (x,y) in sorted(zip(clf.coef_[0], featureNames))]
+    sorted_coeff_vals = sorted(clf.coef_[0])
+    
+    plt.barh(range(len(sorted_coeff_vals)),sorted_coeff_vals, color = '#34495e')
+    plt.yticks(np.asarray(range(len(sorted_coeffs)))+0.5, sorted_coeffs)
+    
+def plot_PCA(features, target):
+    """
+    Plots the features according to 2 principle components using PCA
+    """
+    t1 = PCA(n_components = 2).fit_transform(features)
+    t2 = np.column_stack([t1, target])
+    t3 =pd.DataFrame(data = t2)
+    t3.columns=['First Principle Component','Second Principle Component','Class']
+    sns.lmplot(x='First Principle Component', y='Second Principle Component', \
+               hue='Class', data = t3, palette = 'hls', fit_reg=False)
+
+def plot_CCA(features, target):
+    """
+    Plots the features according to 2 principle components using CCA
+    """
+    t1 = CCA(n_components = 2).fit(features, target).transform(features)
+    t2 = np.column_stack([t1, target])
+    t3 =pd.DataFrame(data = t2)
+    t3.columns=['First Principle Component','Second Principle Component','Class']
+    sns.lmplot(x='First Principle Component', y='Second Principle Component', \
+               hue='Class', data = t3, palette = 'hls', fit_reg=False)
+    
+def plot_PCA_boundary(clf, features, target):
+    """
+    Fit and plot PCA with boundary
+    """
+    t1 = PCA(n_components = 2).fit_transform(features)
+    clf.fit(t1, target)
+    
+    h = .02  # step size in the mesh
+    x_min, x_max = t1[:, 0].min() - 1, t1[:, 0].max() + 1
+    y_min, y_max = t1[:, 1].min() - 1, t1[:, 1].max() + 1
+    xx, yy = np.meshgrid(np.arange(x_min, x_max, h),
+                         np.arange(y_min, y_max, h))
+    
+    Z_proba = clf.predict_proba(np.c_[xx.ravel(), yy.ravel()])
+    
+    Z_mal = Z_proba[:,0].reshape(xx.shape)
+    Z_ben = Z_proba[:,1].reshape(xx.shape)
+    
+    t2 = np.column_stack([t1, trueTarget])
+    t3 =pd.DataFrame(data = t2)
+    t3.columns=['First Principle Component','Second Principle Component','Class']
+    result = sns.lmplot(x='First Principle Component', y='Second Principle Component', \
+               hue='Class', data = t3, palette = 'hls', fit_reg=False)
+    ax_res = result.ax
+    ax_res.contourf(xx, yy, Z_mal, cmap=plt.cm.Reds, alpha=0.25)
+    ax_res.contourf(xx, yy, Z_ben, cmap=plt.cm.Blues, alpha=0.25)
+
+def plot_Manifold_Sep(features, target, n_neighbors = 6):
+    """
+    Plot over various manifolds to see if the data can be decomposed 
+    in 2 dimension other ays
+    """
+    methods = ['standard', 'ltsa', 'hessian', 'modified']
+    labels = ['LLE', 'LTSA', 'Hessian LLE', 'Modified LLE']
+     
+    for i, method in enumerate(methods):
+        t0 = time.time()
+        trans_data = manifold.LocallyLinearEmbedding(n_neighbors, 2,
+                              method=method, eigen_solver = 'dense')\
+                             .fit_transform(features.astype('float64')).T
+        t1 = time.time()
+        print("%s: %.2g sec" % (method, t1 - t0))
+        feat1 = pd.DataFrame(np.column_stack([trans_data.T, target]))
+        feat1.columns = ['FPC', 'SPC', 'Class']
+        sns.lmplot(x='FPC', y='SPC', \
+                   hue='Class', data = feat1, palette = 'hls', fit_reg=False)
+        #sns.jointplot(x='FPC', y="SPC", data=feat1, kind="kde")
+        plt.title(labels[i])
+        
 # =====================================================================    
     
 colnames = ['id_number' ,'Clump_Thickness','Uniformity_of_Cell_Size', 
             'Uniformity_of_Cell_Shape', 'Marginal_Adhesion', 'Single_Epithelial_Cell_Size', 
             'Bare_Nuclei', 'Bland_Chromatin' ,'Normal_Nucleoli',
             'Mitoses','Class']#: (2 for benign, 4 for malignant)
-            
+
+# url containing the data            
 url = "https://archive.ics.uci.edu/ml/machine-learning-databases/breast-cancer-wisconsin/breast-cancer-wisconsin.data"
 s = requests.get(url).content
+
+#grab the dats in csv format
 all_data = pd.read_csv(io.StringIO(s.decode('utf-8')), header = None)
 
+# exploratory data analysis
 all_data.shape
 
 all_data.dtypes
 all_data[6].unique()
 
+# how many values of ?
 all_data[all_data[6] == '?'].shape[0]/float(all_data.shape[0])*100
+
+# Not that many (~2.3%)so lets drop them and reformat
 all_data_noNAs = all_data.drop(all_data.index[all_data[6] == '?'], 0)
 all_data_noNAs[6] = all_data_noNAs[6].astype(int)
- 
+
+# count number benign and malignant
 numBelign = sum(all_data_noNAs[10] == 2)/float(all_data_noNAs.shape[0])*100
 numMalig = sum(all_data_noNAs[10] == 4)/float(all_data_noNAs.shape[0])*100
 
+# create target and features dataset
 target = all_data_noNAs[10]
 features = all_data_noNAs.drop([0, 10], 1)
 
+#check for consistency
 target.unique()
+
+# convert to interpretable results (and to check we dont treat as numerical values)
 trueTarget = pd.Series(['benign' if result==2 else 'malignent' for result in target], index = features.index)
 
-# Plot correlation between features ==========================================
+# Plot correlation between features 
 plot_correlation_matrix(features)
 
-plotData = pd.concat([features, trueTarget], axis = 1, ignore_index = True)
-plotData.columns = colnames[1:-1]+['Result']
-df_long = pd.melt(plotData, 'Result', var_name="Features", value_name="Count")
-sns.set(font_scale = 5)
-plt.figure()
-g = sns.factorplot("Features", hue = 'Result', y="Count", data=df_long, kind="box")
-g.set_xticklabels(rotation=30)
+# Plot correlation between features 
+plot_Features_Box_Plot(features, trueTarget, colnames[1:])
 
-# ==================
+# Plot PCA
+plot_PCA(features, trueTarget)
+
+# ===============================================================
+# Split into test and train datasets
 X_train, X_test, y_train, y_test = train_test_split(features, trueTarget, test_size = 0.2, random_state = 42)
 
+# 10 fold CV logistic regression
 crossVal = 10
-C = np.logspace(0,5,51)
+C = np.logspace(0,5,51) # sweep over regularization params
 LRCV = [LogisticRegressionCV(cv = crossVal, Cs = C, penalty = 'l1', solver = 'liblinear'),
         LogisticRegressionCV(cv = crossVal, Cs = C, penalty = 'l2', solver = 'liblinear')]
-   
+
 classif_rates = []
 for LR in LRCV: 
-    LR.fit(X_train, y_train)
-    y_pred = LR.predict(X_test)
+    LR.fit(X_train, y_train)     # fit model
+    y_pred = LR.predict(X_test)  # predict on test set
+    # find accuracy
     classif_rate = np.mean(y_pred.ravel() == y_test.ravel()) * 100
     classif_rates.append(classif_rate)
-
-# use l2 since all coeffs are preserved
+    
+# Since both the same lets use l2 since all coeffs are preserved
     
 # Logistic Regression Diagnosis ==============================================
-# confusion matrix
+
+# Retrain
 L2 = LogisticRegression(penalty = 'l2', C = LR.C_[0])
 L2.fit(X_train, y_train)
 y_pred = L2.predict(X_test)
 
-prf = precision_recall_fscore_support(y_test, y_pred)
-print('Precision: %s' % prf[0][0])
-print('Recall: %s' % prf[1][0])
-print('f1-score: %s' % prf[2][0])
+# Evaluation metrics
+print_Eval_Metrics(y_pred, y_test)
 
-
+# confusion matrix
 cnf_matrix = confusion_matrix(y_test, y_pred)
 plot_confusion_matrix(cnf_matrix, L2.classes_)
 
-# ROC curve =====================================================================
-
+# ROC curve =
 y_probs = L2.predict_proba(X_test)
 plotROC(y_probs[:,1], L2.classes_[1])
 
-# Learning Curve ==============================================================
-
+# Learning Curve =
 plot_Learning_Curve(X_train, X_test, y_train, y_test, clf = L2, res = 40)
 
-# Plot coeffs ================================================================
+# Plot coeffs =
+plot_Feature_Importances(L2, colnames[1:-1])
 
-sorted_coeffs = [y for (x,y) in sorted(zip(L2.coef_[0],colnames[1:-1]))]
-sorted_coeff_vals = sorted(L2.coef_[0])
-
-plt.figure();plt.clf()
-plt.barh(range(len(sorted_coeff_vals)),sorted_coeff_vals, color = '#34495e')
-plt.yticks(np.asarray(range(len(sorted_coeffs)))+0.5, sorted_coeffs)
 
 # Decision tree ==============================================================
+
 DTC2 = tree.DecisionTreeClassifier(max_depth = 3, max_features = 9)
 DTC2.fit(X_train, y_train)
 y_pred_dtc = DTC2.predict(X_test)
-classif_rate = np.mean(y_pred_dtc.ravel() == y_test.ravel())*100
 
-prf_dtc = precision_recall_fscore_support(y_test, y_pred_dtc)
-print('Precision: %s' % prf_dtc[0][0])
-print('Recall: %s' % prf_dtc[1][0])
-print('f1-score: %s' % prf_dtc[2][0])
+# Print eval metrics =
+print_Eval_Metrics(y_pred_dtc, y_test)
 
+# Plot confusion matrix
 cnf_matrix_dtc = confusion_matrix(y_test, y_pred_dtc)
 plot_confusion_matrix(cnf_matrix_dtc, DTC2.classes_)
 
+# Plot ROC
 y_probs_dtc = DTC2.predict_proba(X_test)
-plotROC(y_probs_dtc, L2.classes_)
+plotROC(y_probs_dtc, DTC2.classes_)
 
+# Plot decision tree
 dot_data = tree.export_graphviz(DTC2, out_file=None, feature_names = colnames[1:-1],
                                 class_names = DTC2.classes_, filled = True,
                                 rounded = True, special_characters = True) 
 graph = pydotplus.graph_from_dot_data(dot_data)
 graph.write_png("breastCancer.png")
 
+# SVM ====================================================
 
-
-# try other classifiers (SVM)====================================================
+# set clsssifiers
 classifiers = [
-    SVC(kernel="linear", C=0.025),
-    SVC(gamma=2, C=1)]
+    SVC(kernel="linear", C = 0.025, probability = True),
+    SVC(gamma=2, C=1, probability = True)]
 
+# perform cross-validation
 scores = []
 for clf in classifiers:
     score = cross_val_score(clf, X_train, y_train, cv = 5)
     scores.append(score)
     print("Model has accuracy: %0.5f (+/- %0.5f)" % (score.mean(), score.std() * 2))
 
+# fit models    
 clf_lin = classifiers[0]
 clf_rbf = classifiers[1]
 clf_lin.fit(X_train, y_train)
 clf_rbf.fit(X_train, y_train)
 
+# evaluate on test set
 y_pred_lin = clf_lin.predict(X_test)
 y_pred_rbf = clf_rbf.predict(X_test)
 
-classif_rate_lin = np.mean(y_pred_lin.ravel() == y_test.ravel())
-classif_rate_rbf = np.mean(y_pred_rbf.ravel() == y_test.ravel())
+# Print evaluation metrics
+print_Eval_Metrics(y_pred_lin, y_test)
+print_Eval_Metrics(y_pred_rbf, y_test)
 
-prf_lin = precision_recall_fscore_support(y_test, y_pred_lin)
-print('Accuracy: %s' % classif_rate_lin)
-print('Precision: %s' % prf_lin[0][0])
-print('Recall: %s' % prf_lin[1][0])
-print('f1-score: %s' % prf_lin[2][0])
-
-prf_rbf = precision_recall_fscore_support(y_test, y_pred_rbf)
-print('Accuracy: %s' % classif_rate_rbf)
-print('Precision: %s' % prf_rbf[0][0])
-print('Recall: %s' % prf_rbf[1][0])
-print('f1-score: %s' % prf_rbf[2][0])
-
+# Plot confusion matrices
 cnf_matrix_lin = confusion_matrix(y_test, y_pred_lin)
 plot_confusion_matrix(cnf_matrix_lin, clf_lin.classes_)
 
 cnf_matrix_rbf = confusion_matrix(y_test, y_pred_rbf)
 plot_confusion_matrix(cnf_matrix_rbf, clf_rbf.classes_)
 
-y_probs_lin = clf_lin.predict_proba(X_test)
-plotROC(y_probs_lin, L2.classes_)
+#y_probs_lin = clf_lin.predict_proba(X_test)
+#plotROC(y_probs_lin, L2.classes_)
 
-# Logistic Regression l2 still wins
+# Plot boundaries==============================================
+clf_rbf2 = SVC(gamma=2, C=1, probability = True)
+clf_lin2 = SVC(kernel="linear", C = 0.025, probability = True)
+
+plot_PCA_boundary(clf_rbf2, features, trueTarget)
+plot_PCA_boundary(clf_lin2, features, trueTarget)
+
+# Other manifolds =============================================
+plot_Manifold_Sep(features, trueTarget)
