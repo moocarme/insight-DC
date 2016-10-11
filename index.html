@@ -527,7 +527,7 @@ numMalig = sum(all_data_noNAs[10] == 4)/float(all_data_noNAs.shape[0])*100
 <p>We see that the two classes vary distinctly in the various features, in which the majority of the benign tumors have values of 1, and malignant have distributions with larger means and higher standard deviations.</p>
 <p>Next we split the data into the feature set, and the target (which are trying to predict).</p>
 <p>We can also look at the correlation between features.</p>
-<p>Mathematically the correlation between features, <span class = 'math'>\(x_1\)</span>, and <span class = 'math'>\(x_2\)</span> as:</p>
+<p>Mathematically the correlation between features, <span class = 'math'>\(x_1\)</span>, and <span class = 'math'>\(x_2\)</span> is:</p>
 <div style="text-align: center;">
 <p> <span class = 'math'>\(r_{xy} = \frac{\sum_{i=1}^n(x_{1i}-\bar{x}_1)(x_{2i}-\bar{x}_2)} {n\sqrt{\sum_{i=1}^n(x_{1i}-\bar{x}_1)^2\sum_{i=1}^n(x_{2i}-\bar{x}_2)^2}}\)</span></p>
 </div>
@@ -610,7 +610,7 @@ for LR in LRCV:
 # Since both the same lets use l2 since all coeffs are preserved
 </pre>
 <p><br></p>
-<p>I end up with a accuracy score for both l1 and l2 regularization parameters as 95.62% which were performed on the test set. I will continue with l2 regularization since all coefficients are preserved</p>
+<p>I end up with a accuracy score for both l1 and l2 regularization parameters as 95.62% which were performed on the test set. I will continue with l2 regularization since all coefficients are preserved.</p>
 <p><br></p>
 <h3>Performance diagnoses</h3>
 <p><br></p>
@@ -662,7 +662,7 @@ plot_Learning_Curve(X_train, X_test, y_train, y_test, clf = L2, res = 40)
   </div>
 </div>                 
 <p><br></p>
-<p>We can use the evaluation metrics <span class = 'math'>\(Precision = \frac{tp}{tp+fp}\)</span>, <span class = 'math'>\(Recall = \frac{tp}{tp+fn}\)</span>, <span class = 'math'>\(Precision = (Precision + Recall)/2)\)</span>, where <span class = 'math'>\(tp\)</span> is the number of true positives, <span class = 'math'>\(fp\)</span> is the number of false positives, and <span class = 'math'>\(fn\)</span> is the number of false negatives.</p>
+<p>We can use the evaluation metrics <span class = 'math'>\(Precision = \frac{tp}{tp+fp}\)</span>, <span class = 'math'>\(Recall = \frac{tp}{tp+fn}\)</span>, <span class = 'math'>\(F1 Score = (Precision + Recall)/2)\)</span>, where <span class = 'math'>\(tp\)</span> is the number of true positives, <span class = 'math'>\(fp\)</span> is the number of false positives, and <span class = 'math'>\(fn\)</span> is the number of false negatives.</p>
 <p><br></p>
 <pre class="brush: python">def print_Eval_Metrics(y_pred, y_test):
     """
@@ -689,7 +689,7 @@ print_Eval_Metrics(y_pred, y_test)
 <tr><th>F1-score</th><td>0.9630</td></tr>
 </table></center>
 <p><br></p>
-<p>Next we can look at the ROC curves and the confusion matrix evaluated on the test set.</p>
+<p>Next, we can look at the ROC curves and the confusion matrix evaluated on the test set.</p>
 <div class = 'row'>
   <pre class="brush: python">def plot_confusion_matrix(cm, classes,
                           normalize=False,
@@ -781,7 +781,8 @@ plotROC(y_probs, L2.classes_)
     <img class="img-responsive" src="figs/conf_mat.png" width = '100%'>
   </div>
 </div>
-<p><br></p>
+<p><br></p> 
+<p>The ROC curve looks quite boxy because of the lack of testing data available, only 137 observations after the 80-20 train-test split. The confusion matrix gives a better understanding of the classification.</p>
 <p>Plotting the feature coefficients for logistic regression tells us the relative importance of the features, in obtaining a true (malignant) observation prediction. Here, we can see that bland chromatin, clump thickness, and mitoses are the most important features for predicting a malignant tumor. Whereas single epithelial cell size is not very important.</p>
 <p><br></p>
 <pre class="brush: python">def plot_Feature_Importances(clf, featureNames):
@@ -1028,7 +1029,7 @@ plot_PCA_boundary(clf_lin2, features, trueTarget)
       				<div class="center">	
               			<h2>Conclusion</h2>
                     <p>To conclude 3 models have been developed. Logistic regression is the overall best model incorporating evaluation metrics and interpretability of the feature importance. A decision tree model was also developed which has the benefit of ease of use in implementation, and could be suited for remote applications where the model can not be run by a computer.</p>
-                    <p>SVMs were also used because of its ability to capture complex relationships between the datapoints. Both linear and radial kernels performed well in their own ways - the linear kernel had perfect precision, but suffered a lot on the recall, the radial function on the other hand, exhibited the best evaluation metrics on the test data, however the model is not very intrepretable.</p>
+                    <p>SVMs were also used because of its ability to capture complex relationships between the datapoints. Both linear and radial kernels performed well in their own ways - the radial basis kernel had perfect precision, but suffered a lot on the recall, the linear kernel on the other hand, exhibited the best evaluation metrics on the test data, however the model is not very intrepretable.</p>
               			<div class="left"> 	
                 			<div class="container">
                 				<div class="sideText4">
