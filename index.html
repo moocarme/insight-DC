@@ -529,7 +529,7 @@ numMalig = sum(all_data_noNAs[10] == 4)/float(all_data_noNAs.shape[0])*100
 <p>We can also look at the correlation between features.</p>
 <p>Mathematically the correlation between features, <span class = 'math'>\(x_1\)</span>, and <span class = 'math'>\(x_2\)</span> as:</p>
 <div style="text-align: center;">
-<p> <span class = 'math'>\(r_{xy} = \frac{\sum_{i=1}^n(x_{1i}-\bar{x}_1)(x_{2i}-\bar{x}_2)} {\sqrt{\sum_{i=1}^n(x_{1i}-\bar{x}_1)^2\sum_{i=1}^n(x_{2i}-\bar{x}_2)^2}}\)</span></p>
+<p> <span class = 'math'>\(r_{xy} = \frac{\sum_{i=1}^n(x_{1i}-\bar{x}_1)(x_{2i}-\bar{x}_2)} {n\sqrt{\sum_{i=1}^n(x_{1i}-\bar{x}_1)^2\sum_{i=1}^n(x_{2i}-\bar{x}_2)^2}}\)</span></p>
 </div>
 <div style="text-align: right;">
   <p>Thanks Carlos <i class="em em-smiley"></i> </p>
